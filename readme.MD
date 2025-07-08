@@ -1,6 +1,6 @@
 # Deliverables:
 1) discord users can ping the bot for the bot to add it to a ping list
-    1.1) !ping amazon 
+    1) !ping amazon 
         1.11) whenever there is an amazon posting, discord bot pings the user
     1.2) !ping california 
         1.21) (location)
