@@ -3,10 +3,9 @@ from discord.ext import commands, tasks
 import logging
 from dotenv import load_dotenv
 import os
-import random
 from manager.manager import Manager
 
-# discord bot will call make/call manager
+JOB_POSTING_CHANNEL = 1392010751023120394
 
 load_dotenv()
 token = os.getenv('DISCORD_TOKEN')
@@ -20,21 +19,51 @@ bot = commands.Bot(command_prefix='!', intents=intents)
 
 @bot.event
 async def on_ready():
-    print(f"{bot.user.name} is ready")
-    andrew_gae.start()
+    print(f"{bot.user.name} is working")
+    update.start()
 
-# bot does smt when u ping it with !hello (this is for us when we want to do feature 1)
+"""
+Uses the manager to periodically check if the job posting database is updated.
+If the database is updated, a response is sent to the discord channel
+
+Args:
+    None
+
+Return:
+    None
+"""
+@tasks.loop(hours=5)
+async def update():
+    if Manager.update():
+        newPostings = Manager.getUpdatedInfo()
+        channel = bot.get_channel(JOB_POSTING_CHANNEL)
+        await channel.send(f"[insert embedding created using newPostings]")
+
+
+"""
+Fowards user query to manager and then sends a response to the discord channel
+
+Args:
+    --time int type: time scale of interest. 
+        ex: --time 5 days
+        note: we can add weeks/months
+    --loc [insert location name]: location of interest. 
+        ex: --loc menlo park 
+        note: (we could do states too)
+    --comp [insert company name]: company of interst.
+        ex: --comp amazon
+
+Returns:
+    None
+"""
 @bot.command()
-async def hello(ctx):
-    await ctx.send(f"your gay <@&{572240275867566080}>")
+async def job(ctx, *args):
+    # args is a tuple
 
-# bot periodically sends a message
-# periodically checks if sqlite db has been update, if it has been updated, then send a message
-@tasks.loop(hours=random.randint(1,12))
-async def andrew_gae():
-    # if db updates...
-    print("hi")
-    channel = bot.get_channel(1392010751023120394)
-    await channel.send(f"<@&{572240275867566080}> is gae")
+    # use args to query
+    queryResults = Manager.getData(args)
+    # sends msg to discord
+    await ctx.send(f"[insert embedding created using info from manager]")
+
 
 bot.run(token, log_handler=handler, log_level=logging.DEBUG)
