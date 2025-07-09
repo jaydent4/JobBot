@@ -4,6 +4,9 @@ import logging
 from dotenv import load_dotenv
 import os
 import random
+from manager.manager import Manager
+
+# discord bot will call make/call manager
 
 load_dotenv()
 token = os.getenv('DISCORD_TOKEN')
