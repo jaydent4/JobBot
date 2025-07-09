@@ -1,7 +1,6 @@
 from abc import ABC, abstractmethod
 
-class base(ABC):
-    @abstractmethod
+class ScraperBase(ABC):
     def __init__(self):
         pass
     
