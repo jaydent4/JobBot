@@ -17,6 +17,8 @@ intents.members = True
 
 bot = commands.Bot(command_prefix='!', intents=intents)
 
+manager = Manager()
+
 @bot.event
 async def on_ready():
     print(f"{bot.user.name} is working")
@@ -34,8 +36,8 @@ Return:
 """
 @tasks.loop(hours=5)
 async def update():
-    if Manager.update():
-        newPostings = Manager.getUpdatedInfo()
+    if manager.update():
+        newPostings = manager.getUpdatedInfo()
         channel = bot.get_channel(JOB_POSTING_CHANNEL)
         await channel.send(f"[insert embedding created using newPostings]")
 
@@ -61,7 +63,7 @@ async def job(ctx, *args):
     # args is a tuple
 
     # use args to query
-    queryResults = Manager.getData(args)
+    queryResults = manager.getData(args)
     # sends msg to discord
     await ctx.send(f"[insert embedding created using info from manager]")
 

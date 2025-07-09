@@ -5,6 +5,8 @@
 class Manager:
     def __init__(self):
         # puts scrapers in list
+        # creates a dB if there isn't one yet; opens existing dB if there is
+        # we can have another dB act as cachce? but how do we ensure temporal and spacial locality?
         pass
     
 
@@ -31,6 +33,7 @@ class Manager:
     Doc strings
 
     This should deal with cache
+    we could also add a column where it makrs if info is new/old which would hopefully make it easier to yoink?
     """
     def getUpdatedInfo(self):
         pass
