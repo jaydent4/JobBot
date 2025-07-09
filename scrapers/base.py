@@ -1,4 +1,4 @@
-from abc import ABC, abstractmethod, classmethod
+from abc import ABC, abstractmethod
 
 class base(ABC):
     @abstractmethod
