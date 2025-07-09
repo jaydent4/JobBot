@@ -1,6 +1,6 @@
-from abc import abstractmethod, classmethod
+from abc import ABC, abstractmethod, classmethod
 
-class base:
+class base(ABC):
     @abstractmethod
     def __init__(self):
         pass
