@@ -4,6 +4,9 @@ aiosignal==1.4.0
 async-timeout==5.0.1
 attrs==25.3.0
 audioop-lts==0.2.1
+beautifulsoup4==4.13.4
+certifi==2025.7.9
+charset-normalizer==3.4.2
 discord.py==2.5.2
 frozenlist==1.7.0
 idna==3.10
@@ -11,5 +14,8 @@ multidict==6.6.3
 propcache==0.3.2
 python-dotenv==1.1.1
 PyYAML==6.0.2
+requests==2.32.4
+soupsieve==2.7
 typing_extensions==4.14.1
+urllib3==2.5.0
 yarl==1.20.1

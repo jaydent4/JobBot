@@ -9,11 +9,6 @@ import yaml
 JOB_POSTING_CHANNEL = None
 UPDATE_RATE = None
 
-with open("default_config.yml", 'r') as stream:
-    data_loaded:dict = yaml.safe_load(stream)
-    # print(data_loaded)
-    JOB_POSTING_CHANNEL = data_loaded["channel"]
-    UPDATE_RATE = data_loaded["rate"]
 
 
 load_dotenv()
@@ -27,7 +22,7 @@ intents.members = True
 bot = commands.Bot(command_prefix='!', intents=intents)
 
 manager = Manager()
-
+assert(0)
 @bot.event
 async def on_ready():
     print(f"{bot.user.name} is working")

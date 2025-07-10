@@ -1,4 +1,4 @@
-from scrapers import ScraperBase
+from scrapers.base import ScraperBase
 import requests
 from bs4 import BeautifulSoup
 
@@ -11,4 +11,3 @@ class GitHubScraper(ScraperBase):
         url = "insert_url"
         
 
-    

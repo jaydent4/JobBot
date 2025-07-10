@@ -1,26 +1,43 @@
-from scrapers import *
+from scrapers.github import GitHubScraper
+import sqlite3
 
 # reference the drawing
 # dB contains repeats (marked in the repost col)
-"""
-dB cols:
-
-job id
-compnay name
-role
-loc
-link
-time posted
-time scraped
-source scrapped
-repost
-"""
 
 class Manager:
     def __init__(self):
+        # makes all the scraper objects here
+        github = GitHubScraper()
         # puts scrapers in list
         # creates a dB if there isn't one yet; opens existing dB if there is
         # we can have another dB act as cachce? but how do we ensure temporal and spacial locality?
+
+        # following: https://docs.python.org/3/library/sqlite3.html
+        try:
+            with sqlite3.connect('job.db') as conn:
+                cur = conn.cursor()
+
+                cur.execute(
+                    """ CREATE TABLE IF NOT EXISTS jobPostings(
+                        id INTEGER PRIMARY KEY, 
+                        company_name TEXT NOT NULL, 
+                        role TEXT NOT NULL, 
+                        location TEXT NOT NULL, 
+                        application_link TEXT NOT NULL, 
+                        time_posted DATE NOT NULL, 
+                        time_scraped DATE NOT NULL, 
+                        scrape_source TEXT NOT NULL,
+                        repost INT NOT NULL
+                        );"""
+                )
+
+                # commit the changes
+                conn.commit()
+
+                print("Table created successfully.")
+        except sqlite3.OperationalError as e:
+            print("Failed to", e)
+
         pass
     
 
