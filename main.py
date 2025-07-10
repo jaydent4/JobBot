@@ -36,8 +36,9 @@ Return:
 """
 @tasks.loop(hours=5)
 async def update():
-    if manager.update():
-        newPostings = manager.getUpdatedInfo()
+    updateInfo = manager.update()
+    if updateInfo[0]:
+        newPostings = updateInfo[1]
         channel = bot.get_channel(JOB_POSTING_CHANNEL)
         await channel.send(f"[insert embedding created using newPostings]")
 

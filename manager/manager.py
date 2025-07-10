@@ -1,6 +1,20 @@
 from scrapers import *
 
 # reference the drawing
+# dB contains repeats (marked in the repost col)
+"""
+dB cols:
+
+job id
+compnay name
+role
+loc
+link
+time posted
+time scraped
+source scrapped
+repost
+"""
 
 class Manager:
     def __init__(self):
@@ -11,31 +25,38 @@ class Manager:
     
 
     """
-    Doc strings
-    """
-    def call_scraper(self, scraper):
-        pass
 
-
-    """
-    updates the database by calling scrapers
     Args:
-
+        None
 
     Returns:
-        T/F based on if the dB got updated
+        dict: containing unique job postings from all scrapers
+    """
+    def run_scrapers(self):
+        pass
+
+
+    """
+    Calls scrapers then checks if dB updated
+    Args:
+        None
+
+    Returns:
+        (tuple[bool, dict]): bool is true if dB updated, bool is false if dB did not update, dict is the dictionary of new postings
     """
     def update(self):
-        pass
+        newPostings = self.run_scrapers()
+        # cache would be updated somewhere in this method
+        self.updateDB()
+        if len(newPostings) > 0:
+            return (True, newPostings)
+        else:
+            return (False, None)
+        
     
-
-    """
-    Doc strings
-
-    This should deal with cache
-    we could also add a column where it makrs if info is new/old which would hopefully make it easier to yoink?
-    """
-    def getUpdatedData(self):
+    # if we have a getter, we need a setter right lmao
+    # needs to check against existing postings, if it already exists, make sure to mark the repost col
+    def updateDB(self):
         pass
 
     
@@ -54,6 +75,4 @@ class Manager:
         # personally i think its more useful for user to query the bot rather than have bot maintain info about which user wants what-
         pass
 
-    # if we have a getter, we need a setter right lmao
-    def setData(self):
-        pass
+    
