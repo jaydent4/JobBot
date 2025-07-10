@@ -1,4 +1,4 @@
-# imports all the scrapers
+from scrapers import *
 
 # reference the drawing
 
@@ -13,7 +13,7 @@ class Manager:
     """
     Doc strings
     """
-    def call_scraper(self):
+    def call_scraper(self, scraper):
         pass
 
 
@@ -35,7 +35,7 @@ class Manager:
     This should deal with cache
     we could also add a column where it makrs if info is new/old which would hopefully make it easier to yoink?
     """
-    def getUpdatedInfo(self):
+    def getUpdatedData(self):
         pass
 
     

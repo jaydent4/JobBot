@@ -59,9 +59,7 @@ Returns:
     None
 """
 @bot.command()
-async def job(ctx, *args):
-    # args is a tuple
-
+async def job(ctx, *args): # args is a tuple
     # use args to query
     queryResults = manager.getData(args)
     # sends msg to discord
