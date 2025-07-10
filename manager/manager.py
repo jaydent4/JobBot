@@ -1,4 +1,6 @@
-from scrapers import *
+from config import Config
+import importlib
+from logging_config import setup_logging
 
 # reference the drawing
 # dB contains repeats (marked in the repost col)
@@ -17,15 +19,38 @@ repost
 """
 
 class Manager:
-    def __init__(self):
-        # puts scrapers in list
-        # creates a dB if there isn't one yet; opens existing dB if there is
-        # we can have another dB act as cachce? but how do we ensure temporal and spacial locality?
-        pass
+    def __init__(self, config: Config):
+        self.sources = list(config.sources.keys())
+        self.scrapers = {}
+        self.rate = config.rate
+        self.logger = setup_logging("Manager", "INFO", "INFO", "manager.log")
     
+    """
+    Attempt to load all scrapers from configurations
+    """
+    def load_scrapers(self):
+        for name in self.sources:
+            module_name = "scrapers." + name.lower() + "_scraper"
+            try:
+                self.logger.info(f'Attempting to load module: {module_name}')
+                module = importlib.import_module(module_name)
+                scraper = getattr(module, name.captialize + "Scraper")
+                self.scrapers[name] = scraper()
+            except Exception as e:
+                self.logger.error(f'Something occurred while attempting to load {module_name}: {e}')
+    
+    """
+    Args:
+        name: name of the scraper/site
+    Returns:
+        scrape results (TBD)
+    """
+    def scrape(self, name):
+        if not self.scrapers[name]:
+            return None
+        return self.scrapers[name].scrape()
 
     """
-
     Args:
         None
 
@@ -33,7 +58,10 @@ class Manager:
         dict: containing unique job postings from all scrapers
     """
     def run_scrapers(self):
-        pass
+        result = {}
+        for name in self.scrapers.keys():
+            result[name] = self.scrape(name)
+        return result
 
 
     """
@@ -75,4 +103,4 @@ class Manager:
         # personally i think its more useful for user to query the bot rather than have bot maintain info about which user wants what-
         pass
 
-    
+        

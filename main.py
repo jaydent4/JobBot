@@ -4,17 +4,12 @@ import logging
 from dotenv import load_dotenv
 import os
 from manager.manager import Manager
-import yaml
+from logging_config import setup_logging
+from config import Config
 
-JOB_POSTING_CHANNEL = None
-UPDATE_RATE = None
+config = Config("config.yml")
 
-with open("default_config.yml", 'r') as stream:
-    data_loaded:dict = yaml.safe_load(stream)
-    # print(data_loaded)
-    JOB_POSTING_CHANNEL = data_loaded["channel"]
-    UPDATE_RATE = data_loaded["rate"]
-
+JOB_POSTING_CHANNEL = config.channel
 
 load_dotenv()
 token = os.getenv('DISCORD_TOKEN')
@@ -43,7 +38,7 @@ Args:
 Return:
     None
 """
-@tasks.loop(hours=UPDATE_RATE)
+@tasks.loop(hours=config.rate)
 async def update():
     updateInfo = manager.update()
     if updateInfo[0]:
