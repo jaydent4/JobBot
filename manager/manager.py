@@ -13,8 +13,6 @@ class Manager:
         self.logger = setup_logging("Manager", "INFO", "INFO", "manager.log")
         print(self.logger)
 
-        # makes all the scraper objects here
-
         self.sources = list(config.sources.keys())
         #print(self.sources)
         
