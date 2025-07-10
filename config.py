@@ -23,4 +23,4 @@ class Config:
     
     def display_config(self):
         logger = setup_logging("config_logger", "DEBUG", "DEBUG")
-        logger.info(f'PRINTING CONFIG:\n\tsources: {self.sources}')
+        logger.info(f'PRINTING CONFIG:\n\tsources: {self.sources}\n\tchannel: {self.channel}\n\trate: {self.rate}\n')
