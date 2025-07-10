@@ -14,7 +14,7 @@ rate: float
 """
 
 class Config:
-    def __init__(self, config="defautl_config.yml"):
+    def __init__(self, config="default_config.yml"):
         with open(config, 'r') as f:
             config_data = yaml.load(f, Loader=yaml.FullLoader)
             self.sources = config_data["sources"]

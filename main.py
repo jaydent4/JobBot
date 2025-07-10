@@ -4,12 +4,13 @@ import logging
 from dotenv import load_dotenv
 import os
 from manager.manager import Manager
-import yaml
+from logging_config import setup_logging
+from config import Config
 
-JOB_POSTING_CHANNEL = None
-UPDATE_RATE = None
+config = Config()
 
-
+JOB_POSTING_CHANNEL = config.channel
+UPDATE_RATE = config.rate
 
 load_dotenv()
 token = os.getenv('DISCORD_TOKEN')
@@ -22,7 +23,7 @@ intents.members = True
 bot = commands.Bot(command_prefix='!', intents=intents)
 
 manager = Manager()
-assert(0)
+
 @bot.event
 async def on_ready():
     print(f"{bot.user.name} is working")

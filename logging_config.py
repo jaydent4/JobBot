@@ -34,7 +34,7 @@ def setup_logging(name: str, log_level: str, file_level: str, log_file='bot.log'
         return logger
     
     # Format log statements
-    formatter = logging.Formattter(
+    formatter = logging.Formatter(
         "[%(asctime)s] [%(levelname)s] [%(name)s] %(message)s",
         datefmt="%Y-%m-%d %H:%M:%S"
     )

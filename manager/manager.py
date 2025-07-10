@@ -1,15 +1,32 @@
-from scrapers.github import GitHubScraper
 import sqlite3
+from config import Config
+import importlib
+from logging_config import setup_logging
 
-# reference the drawing
 # dB contains repeats (marked in the repost col)
 
 class Manager:
     def __init__(self):
+        config = Config()
+
+         # sets up logger
+        self.logger = setup_logging("Manager", "INFO", "INFO", "manager.log")
+        print(self.logger)
+
         # makes all the scraper objects here
-        github = GitHubScraper()
-        # puts scrapers in list
-        # creates a dB if there isn't one yet; opens existing dB if there is
+
+        self.sources = list(config.sources.keys())
+        #print(self.sources)
+        
+        # puts scrapers in dict[str, str] ex: github: GitHubScraper (object)
+        self.scrapers = {}
+
+        # loads all the scrapers
+        self.load_scrapers()
+
+        # not sure if rate is needed here
+        self.updateRate = config.rate
+        
         # we can have another dB act as cachce? but how do we ensure temporal and spacial locality?
 
         # following: https://docs.python.org/3/library/sqlite3.html
@@ -17,6 +34,7 @@ class Manager:
             with sqlite3.connect('job.db') as conn:
                 cur = conn.cursor()
 
+                # creates a dB if there isn't one yet; opens existing dB if there is
                 cur.execute(
                     """ CREATE TABLE IF NOT EXISTS jobPostings(
                         id INTEGER PRIMARY KEY, 
@@ -39,10 +57,33 @@ class Manager:
             print("Failed to", e)
 
         pass
-    
 
     """
+    Attempt to load all scrapers from configurations
+    """
+    def load_scrapers(self):
+        for name in self.sources:
+            module_name = "scrapers." + name.lower()
+            try:
+                self.logger.info(f'Attempting to load module: {module_name}')
+                module = importlib.import_module(module_name)
+                scraper = getattr(module, name.upper() + "Scraper")
+                self.scrapers[name] = scraper()
+            except Exception as e:
+                self.logger.error(f'Something occurred while attempting to load {module_name}: {e}')
+    
+    """
+    Args:
+        name: name of the scraper/site
+    Returns:
+        scrape results (TBD)
+    """
+    def scrape(self, name):
+        if not self.scrapers[name]:
+            return None
+        return self.scrapers[name].scrape()
 
+    """
     Args:
         None
 
@@ -50,7 +91,11 @@ class Manager:
         dict: containing unique job postings from all scrapers
     """
     def run_scrapers(self):
-        pass
+        result = {}
+        for name in self.scrapers.keys():
+            result[name] = self.scrape(name)
+        # need to parse for uniqueness after result is populated
+        return result
 
 
     """
@@ -92,4 +137,4 @@ class Manager:
         # personally i think its more useful for user to query the bot rather than have bot maintain info about which user wants what-
         pass
 
-    
+        

@@ -2,7 +2,7 @@ from scrapers.base import ScraperBase
 import requests
 from bs4 import BeautifulSoup
 
-class GitHubScraper(ScraperBase):
+class GITHUBScraper(ScraperBase):
     def __init__(self):
         pass
 
