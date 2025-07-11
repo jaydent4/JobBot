@@ -1,0 +1,7 @@
+id,company_name,role,location,application_link,date_posted,time_posted,date_scraped,time_scraped,scrape_source
+1,amazon,swe,menlo park,www.yourmom.com,01 Jun 2025,11:20,02 Jun 2025,11:20,github
+2,google,swe,nyc,www.kapeeshisgae.com,05 Jun 2025,11:20,07 Jun 2025,9:20,facebook
+3,amazon,test writer,la,www.andrew-is-gae.com,13 Apr 2024,04:30,15 Apr 2015,01:03,indeed
+4,amazon,ML,ca,www.jaydenis-also-gae.com,05 Jun 2025,11:20,09 June 2025,02:30,github
+5,meta,swe,canada,www.jinsnotgae.com,07 May 2025,09:10,11 May 2025,05:30,monster
+5,nvidia,EE,LA,www.heheharhar.com,21 Jun 2025,12:10,15 Jun 2000,10:30,github

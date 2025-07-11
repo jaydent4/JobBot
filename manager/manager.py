@@ -2,6 +2,7 @@ import sqlite3
 from config import Config
 import importlib
 from logging_config import setup_logging
+import pandas as pd
 
 # dB contains repeats (marked in the repost col)
 
@@ -29,32 +30,53 @@ class Manager:
 
         # following: https://docs.python.org/3/library/sqlite3.html
         try:
-            with sqlite3.connect('job.db') as conn:
-                cur = conn.cursor()
+            with sqlite3.connect('job.db') as self.conn:
+                self.cur = self.conn.cursor()
 
                 # creates a dB if there isn't one yet; opens existing dB if there is
-                cur.execute(
+                self.cur.execute(
                     """ CREATE TABLE IF NOT EXISTS jobPostings(
                         id INTEGER PRIMARY KEY, 
                         company_name TEXT NOT NULL, 
                         role TEXT NOT NULL, 
                         location TEXT NOT NULL, 
                         application_link TEXT NOT NULL, 
-                        time_posted DATE NOT NULL, 
-                        time_scraped DATE NOT NULL, 
-                        scrape_source TEXT NOT NULL,
-                        repost INT NOT NULL
+                        date_posted DATE NOT NULL,
+                        time_posted TIME NOT NULL, 
+                        date_scraped DATE NOT NULL,
+                        time_scraped TIME NOT NULL, 
+                        scrape_source TEXT NOT NULL
                         );"""
                 )
 
                 # commit the changes
-                conn.commit()
+                self.conn.commit()
 
                 print("Table created successfully.")
         except sqlite3.OperationalError as e:
             print("Failed to", e)
 
-        pass
+        # TRYING TO LOAD FAKE DATA AND INSERT INTO DB, IT WORKS BTW
+        data = pd.read_csv("./manager/fake_data.csv")
+        print(data)
+        data = data.values.tolist()
+
+        #not tested
+        for row in data:
+            try:
+                self.cur.execute("INSERT INTO jobPostings VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", row)
+                self.conn.commit()
+            except Exception as e:
+                if e == "UNIQUE constraint failed: jobPostings.id":
+                    pass
+                else:
+                    self.logger.error(f"Something errored while inserting scrapped job postings into the main database: {e}")
+ 
+        for row in self.cur.execute("SELECT * FROM jobPostings ORDER BY id"):
+            print(row)
+        
+        # checking queries, but how to make sure we dont' ahve 10! query cases?
+        #self.cur.execute()
 
     """
     Attempt to load all scrapers from configurations
@@ -74,9 +96,9 @@ class Manager:
     Args:
         name: name of the scraper/site
     Returns:
-        scrape results (TBD)
+        list[tuple]: each tuple is a separate job posting, each tuple must contain 11 elements in the order of the columns in the database
     """
-    def scrape(self, name):
+    def scrape(self, name) -> list[tuple] | None:
         if not self.scrapers[name]:
             return None
         return self.scrapers[name].scrape()
@@ -107,8 +129,9 @@ class Manager:
     def update(self):
         newPostings = self.run_scrapers()
         # cache would be updated somewhere in this method
-        self.updateDB()
         if len(newPostings) > 0:
+            self.checkReposts()
+            self.updateDB()
             return (True, newPostings)
         else:
             return (False, None)
@@ -116,7 +139,24 @@ class Manager:
     
     # if we have a getter, we need a setter right lmao
     # needs to check against existing postings, if it already exists, make sure to mark the repost col
-    def updateDB(self):
+    """
+    Inserts scrapped job postings into the main database
+    Args:
+
+    Returns:
+        None
+    """
+    def updateDB(self, jobpostings: list[tuple]) -> None:
+        try:
+            self.cur.executemany("INSERT INTO jobPostings VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)", jobpostings)
+            self.conn.commit()
+        except Exception as e:
+            self.logger.error(f"Something errored while inserting scrapped job postings into the main database: {e}")
+
+
+    """
+    """
+    def checkReposts(self, jobPostings: list[tuple]) -> None:
         pass
 
     
@@ -124,7 +164,12 @@ class Manager:
     Doc strings
     """
     def getData(self, args: tuple):
-        # gonna parse input data here or in another method in manager
+        # parse args
+
+        # how do we not have like 10! cases...
+        # https://codedamn.com/news/sql/how-to-write-multiple-where-conditions-in-sql
+        # https://docs.python.org/3/library/sqlite3.html
+
 
         # reference job method in main.py
         # lists all postings of type x (ML, SWE, etc) *need to check validity
