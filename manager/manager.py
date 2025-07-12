@@ -61,22 +61,32 @@ class Manager:
         print(data)
         data = data.values.tolist()
 
-        #not tested
-        for row in data:
-            try:
-                self.cur.execute("INSERT INTO jobPostings VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", row)
-                self.conn.commit()
-            except Exception as e:
-                if e == "UNIQUE constraint failed: jobPostings.id":
-                    pass
-                else:
-                    self.logger.error(f"Something errored while inserting scrapped job postings into the main database: {e}")
+        try:
+            self.cur.executemany("INSERT INTO jobPostings VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data)
+            self.conn.commit()
+            print('hi') # when its in db it won't insert it again (hi does not get printed)
+        except Exception as e:
+            self.logger.error(f"Something errored while inserting scrapped job postings into the main database: {e}")
  
         for row in self.cur.execute("SELECT * FROM jobPostings ORDER BY id"):
             print(row)
         
+        # need to calculate today's date and the input argument ex: --time 5 day and then input that somehow as a query to sql
+
+        print("------")
         # checking queries, but how to make sure we dont' ahve 10! query cases?
-        #self.cur.execute()
+        # queryResult = self.cur.execute("""SELECT * FROM jobPostings 
+        #                                WHERE company_name = 'amazon' (side note: this also works: WHERE company_name in ('amazon'))
+        #                                AND role = 'ML'
+        #                                AND date_posted > '2025-06-01'
+        #                                AND time_posted >= '01:04' (side note can also do: time_posted > '01:04:00.000')
+        #                                """)
+        queryResult = self.cur.execute("""SELECT * FROM jobPostings 
+                                       WHERE company_name in ('amazon')
+                                       AND role = 'ML'
+                                       """)
+        for row in queryResult:
+            print(row)
 
     """
     Attempt to load all scrapers from configurations
@@ -130,7 +140,6 @@ class Manager:
         newPostings = self.run_scrapers()
         # cache would be updated somewhere in this method
         if len(newPostings) > 0:
-            self.checkReposts()
             self.updateDB()
             return (True, newPostings)
         else:
@@ -153,18 +162,14 @@ class Manager:
         except Exception as e:
             self.logger.error(f"Something errored while inserting scrapped job postings into the main database: {e}")
 
-
-    """
-    """
-    def checkReposts(self, jobPostings: list[tuple]) -> None:
-        pass
-
     
     """
     Doc strings
     """
     def getData(self, args: tuple):
         # parse args
+
+        # if there is a time argument like -time 5 days, need to calculate what that new date is from today's date
 
         # how do we not have like 10! cases...
         # https://codedamn.com/news/sql/how-to-write-multiple-where-conditions-in-sql
