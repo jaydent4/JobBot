@@ -106,7 +106,7 @@ class Manager:
     Args:
         name: name of the scraper/site
     Returns:
-        list[tuple]: each tuple is a separate job posting, each tuple must contain 11 elements in the order of the columns in the database
+        list[tuple]: each tuple is a separate job posting, each tuple must contain 10 elements in the order of the columns in the database
     """
     def scrape(self, name) -> list[tuple] | None:
         if not self.scrapers[name]:
