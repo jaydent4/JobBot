@@ -152,7 +152,7 @@ class Manager:
     Returns:
         None
     """
-    def updateDB(self, jobpostings: list[tuple]) -> None:
+    def update_DB(self, jobpostings: list[tuple]) -> None:
         try:
             self.cur.executemany("INSERT INTO jobPostings VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)", jobpostings)
             self.conn.commit()
@@ -163,7 +163,7 @@ class Manager:
     """
     Doc strings
     """
-    def getData(self, args: tuple):
+    def get_data(self, args: tuple):
         # parse args
 
         # if there is a time argument like -time 5 days, need to calculate what that new date is from today's date
@@ -181,5 +181,7 @@ class Manager:
 
         # personally i think its more useful for user to query the bot rather than have bot maintain info about which user wants what-
         pass
+
+    def parse_args
 
         
