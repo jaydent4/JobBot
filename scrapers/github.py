@@ -7,7 +7,15 @@ class GITHUBScraper(ScraperBase):
         pass
 
     @classmethod
-    def scrape():
-        url = "insert_url"
-        
+    def scrape(cls):
+        url = "https://github.com/SimplifyJobs/Summer2026-Internships"
+        result = requests.get(url).text
+        doc = BeautifulSoup(result, "html.parser")
 
+        job_tables = doc.find('markdown-accessibility-table')  
+
+        print(job_tables)
+
+
+if __name__ == "__main__":
+    GITHUBScraper.scrape()
