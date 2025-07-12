@@ -7,24 +7,21 @@ import pandas as pd
 # dB contains repeats (marked in the repost col)
 
 class Manager:
-    def __init__(self):
-        config = Config()
+    def __init__(self, sources):
 
          # sets up logger
         self.logger = setup_logging("Manager", "INFO", "INFO", "manager.log")
         print(self.logger)
 
-        self.sources = list(config.sources.keys())
+        self.sources = sources
         #print(self.sources)
         
-        # puts scrapers in dict[str, str] ex: github: GitHubScraper (object)
+        # puts scrapers in dict[str, Obj] ex: github: GitHubScraper (object)
         self.scrapers = {}
 
         # loads all the scrapers
         self.load_scrapers()
 
-        # not sure if rate is needed here
-        self.updateRate = config.rate
         
         # we can have another dB act as cachce? but how do we ensure temporal and spacial locality?
 
