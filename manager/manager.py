@@ -165,7 +165,7 @@ class Manager:
     """
     def get_data(self, args: tuple):
         # parse args
-
+        self.parse_args(args)
         # if there is a time argument like -time 5 days, need to calculate what that new date is from today's date
 
         # how do we not have like 10! cases...
@@ -182,6 +182,31 @@ class Manager:
         # personally i think its more useful for user to query the bot rather than have bot maintain info about which user wants what-
         pass
 
-    def parse_args
+    
+    """
+    Parses arguments into a dictionary
+    Args:
+        args: tuple of arguments passed from discord bot
+    
+    Returns:
+        dict: arguments parsed into a dictionary, None if arguments are invalid
+    """
+    # temporary arg parser, will fix later
+    def parse_args(self, args: tuple) -> dict:
+        parsed_args = {}
+        arg_type = None
+        for arg in args:
+            if not arg_type and arg.startswith("--"):
+                arg_type = arg[2:]
+            elif arg_type and not arg.startswith("--"):
+                parsed_args[arg_type] = arg
+                arg_type = None
+            else:
+                self.logger.error(f' {arg_type}: {arg} is an invalid argument')
+                return None
+        return parsed_args
+
+        
+
 
         
