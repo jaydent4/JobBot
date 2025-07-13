@@ -1,13 +1,10 @@
 import sqlite3
-from config import Config
 import importlib
 from logging_config import setup_logging
-import pandas as pd
 from .args import validate, parse
 import time
-from const import ARG_TYPES, Columns, Valid_Args
+from const import Valid_Args
 
-# dB contains repeats (marked in the repost col)
 
 class Manager:
     def __init__(self, sources):
@@ -55,37 +52,52 @@ class Manager:
         except sqlite3.OperationalError as e:
             print("Failed to create table because:", e)
 
-        # TRYING TO LOAD FAKE DATA AND INSERT INTO DB, IT WORKS BTW
-        data = pd.read_csv("./manager/fake_data.csv")
-        print(data)
-        data = data.values.tolist()
+        # # TRYING TO LOAD FAKE DATA AND INSERT INTO DB, IT WORKS BTW
+        # data = pd.read_csv("./manager/fake_data.csv")
+        # print(data)
+        # data = data.values.tolist()
 
-        try:
-            self.cur.executemany("INSERT INTO jobPostings VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data)
-            self.conn.commit()
-            print('hi') # when its in db it won't insert it again (hi does not get printed)
-        except Exception as e:
-            self.logger.error(f"Something errored while inserting scrapped job postings into the main database: {e}")
+        # try:
+        #     self.cur.executemany("INSERT INTO jobPostings VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data)
+        #     self.conn.commit()
+        #     print('hi') # when its in db it won't insert it again (hi does not get printed)
+        # except Exception as e:
+        #     self.logger.error(f"Something errored while inserting scrapped job postings into the main database: {e}")
  
-        for row in self.cur.execute("SELECT * FROM jobPostings ORDER BY id"):
-            print(row)
+        # for row in self.cur.execute("SELECT * FROM jobPostings ORDER BY id"):
+        #     print(row)
         
-        # need to calculate today's date and the input argument ex: --time 5 day and then input that somehow as a query to sql
+        # # need to calculate today's date and the input argument ex: --time 5 day and then input that somehow as a query to sql
 
-        print("------")
-        # checking queries, but how to make sure we dont' ahve 10! query cases?
-        # queryResult = self.cur.execute("""SELECT * FROM jobPostings 
-        #                                WHERE company_name = 'amazon' (side note: this also works: WHERE company_name in ('amazon'))
-        #                                AND role = 'ML'
-        #                                AND date_posted > '2025-06-01'
-        #                                AND time_posted >= '01:04' (side note can also do: time_posted > '01:04:00.000')
+        # print("------")
+        # # checking queries, but how to make sure we dont' ahve 10! query cases?
+        # # queryResult = self.cur.execute("""SELECT * FROM jobPostings 
+        # #                                WHERE company_name = 'amazon' (side note: this also works: WHERE company_name in ('amazon'))
+        # #                                AND role = 'ML'
+        # #                                AND date_posted > '2025-06-01'
+        # #                                AND time_posted >= '01:04' (side note can also do: time_posted > '01:04:00.000')
+        # #                                """)
+        # queryControl = self.cur.execute("""SELECT * FROM jobPostings 
+        #                                WHERE company_name in ('amazon')
+        #                                AND level = 'intern'
         #                                """)
-        queryResult = self.cur.execute("""SELECT * FROM jobPostings 
-                                       WHERE company_name in ('amazon')
-                                       AND role = 'ML'
-                                       """)
-        for row in queryResult:
-            print(row)
+        # for row in queryControl:
+        #     print(row)
+
+        # print("---")
+        # s1 = """SELECT * FROM jobPostings
+        #                       WHERE company_name = 'amazon'
+        #                       """        
+        # s2 = """SELECT * FROM jobPostings
+        #                       WHERE date_posted >= '2025-06-01'
+        #                     """
+        # L = "LIMIT 2"
+        # intersection = s1 + "INTERSECT " + s2 + " " + L
+        # q = self.cur.execute(intersection)
+
+        # for row in q:
+        #     print(row)
+
 
     """
     Attempt to load all scrapers from configurations
@@ -113,6 +125,7 @@ class Manager:
             self.logger.error(f'Scraper for {name} does not exist')
             return None
         return self.scrapers[name].scrape()
+
 
     """
     Args:
@@ -154,8 +167,6 @@ class Manager:
             return (False, None)
         
     
-    # if we have a getter, we need a setter right lmao
-    # needs to check against existing postings, if it already exists, make sure to mark the repost col
     """
     Inserts scrapped job postings into the main database
     Args:
@@ -173,57 +184,52 @@ class Manager:
 
     
     """
-    Doc strings
+    Returns data from the database with respect to flags
+
+    Valid flags:
+        --time:
+            ex: --time 5
+        --company
+            ex: --company amazon
+        --role
+            ex: --role swe
+        --location
+            ex: --location mento_park 
+        --level
+            ex: --level intern 
+        --count
+            ex: --count 10 
+
+    Args:
+        args (tuple): args inputted by the user
+    
+    Returns:
+        (list[tuple]): a list of jobpostings; each post is a tuple in the list
     """
     def get_data(self, args: tuple) -> list[tuple] | None:
-        
         if not validate(args):
             return None
         
         parsed_args = parse(args)
+        assert(len(parsed_args) == 6)
         
-        count = 1 # default return 1 jobposting from query
+        count = 1 # default return 1 jobposting from database
         if parsed_args[Valid_Args.COUNT] is not None:
-            count = parsed_args[Valid_Args.COUNT]
+            count = parsed_args[Valid_Args.COUNT][1]
 
-    #      "--time",
-    # "--company"
-    # "--role",
-    # "--location",
-    # "--level",
-    # "--count"
-
-        query_str = "SELECT * FROM jobPostings"
-        time_str = ""
-        company_str = ""
-        role_str = ""
-        loc_str = ""
-        level_str = ""
+        base_str = "SELECT * FROM jobPostings WHERE "
+        final_query_str = ""
         count_str = "LIMIT " + str(count) # put this at the very end of the string
 
-        
+        operator = ">=" # the start arg is time, its a >= comparison
+        for i in range(len(parsed_args) - 1):
+            arg_val = parsed_args[i]
+            if arg_val != None:
+                query_str = base_str + f"{arg_val[0]} " + operator + f" \'{arg_val[1]}\' INTERSECT "
+                final_query_str += query_str
+                print(final_query_str) # debug
+            operator = "=" # all other args are equality comparsions
 
-        # finding the first valid arg and putting where in front, rest gets ANDS
+        return self.cur.execute(final_query_str + count_str)
+    
 
-        # what if we construct the query string from scratch
-        # componenets and then if componenets exist then we add it to the string and see how that works out
-
-        # if there is a time argument like -time 5 days, need to calculate what that new date is from today's date
-
-        # how do we not have like 6! cases...
-        # https://codedamn.com/news/sql/how-to-write-multiple-where-conditions-in-sql
-        # https://docs.python.org/3/library/sqlite3.html
-
-
-        # reference job method in main.py
-        # lists all postings of type x (ML, SWE, etc) *need to check validity
-        # lists all postings at location x (Ca, NY, etc) *need to chekc validity, like if i pass in moon
-        # lists all postings from company x (amazon, meta, etc) *need to chekc validity
-        # lists all postings in the last 10 days (default of --time 10 d)
-
-        # personally i think its more useful for user to query the bot rather than have bot maintain info about which user wants what-
-        return None
-
-
-
-        

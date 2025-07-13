@@ -43,9 +43,9 @@ Return:
 async def update():
     updateInfo = manager.update()
     if updateInfo[0]:
-        newPostings = updateInfo[1]
+        new_postings = updateInfo[1]
         channel = bot.get_channel(JOB_POSTING_CHANNEL)
-        await channel.send(f"[insert embedding created using newPostings]")
+        await channel.send(f"{new_postings}")
 
 
 """
@@ -67,9 +67,9 @@ Returns:
 @bot.command()
 async def job(ctx, *args): # args is a tuple
     # use args to query
-    queryResults: list[tuple] = manager.getData(args)
+    query_results: list[tuple] = manager.getData(args)
     # sends msg to discord
-    await ctx.send(f"[insert embedding created using info from manager]")
+    await ctx.send(f"{query_results}")
 
 
 bot.run(token, log_handler=handler, log_level=logging.DEBUG)

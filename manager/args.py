@@ -1,6 +1,6 @@
 from logging_config import setup_logging
-from const import ARG_TYPES, Columns, Valid_Args
-from const import ARG_TYPES, Columns
+from const import ARG_TYPES, Valid_Args
+from const import ARG_TYPES
 from datetime import date, timedelta
 
 logger = setup_logging("args", "ERROR", "ERROR", "args.log")
@@ -60,16 +60,21 @@ def parse(args) -> tuple:
         else:
             match current_arg_type:
                 case "time":
-                    parsed_args[Columns.TIME_POSTED] = ("time_posted", count_days(arg))
+                    parsed_args[Valid_Args.TIME] = ("time_posted", count_days(arg))
                 case "company":
-                    parsed_args[Columns.COMPANY_NAME] = ("company_name", arg)
+                    parsed_args[Valid_Args.COMPANY] = ("company_name", arg)
                 case "role":
-                    parsed_args[Columns.ROLE] = ("role", arg)
+                    parsed_args[Valid_Args.ROLE] = ("role", arg)
                 case "location":
-                    parsed_args[Columns.LOCATION] = ("location", arg)
+                    parsed_args[Valid_Args.LOCATION] = ("location", arg)
+                case "level":
+                    parsed_args[Valid_Args.LEVEL] = ("level", arg)
+                case "count":
+                    parsed_args[Valid_Args.COUNT] = ("count", arg)
             current_arg_type = None
     logger.info(f'Parsed args: {parsed_args}')
     return tuple(parsed_args)
+
 
 def count_days(time) -> str:
     today = date.today()
@@ -78,5 +83,3 @@ def count_days(time) -> str:
     return past_date.strftime('%Y-%m-%d')
                 
                 
-
-    
