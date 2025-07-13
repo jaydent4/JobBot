@@ -1,5 +1,5 @@
 from logging_config import setup_logging
-from const import ARG_TYPES, Columns
+from const import ARG_TYPES, Columns, Valid_Args
 
 logger = setup_logging("args", "ERROR", "ERROR", "args.log")
 
@@ -50,7 +50,7 @@ Returns:
     tuple
 """
 def parse(args) -> tuple:
-    parsed_args = [None] * Columns.ARGS_SIZE
+    parsed_args = [None] * Valid_Args.SIZE
     current_arg_type = None
     for arg in args:
         if arg.startswith("--"):
@@ -58,17 +58,17 @@ def parse(args) -> tuple:
         else:
             match current_arg_type:
                 case "time":
-                    parsed_args[Columns.TIME_POSTED] = arg
+                    parsed_args[Valid_Args.TIME] = arg
                 case "company":
-                    parsed_args[Columns.COMPANY_NAME] = arg
+                    parsed_args[Valid_Args.COMPANY] = arg
                 case "role":
-                    parsed_args[Columns.ROLE] = arg
+                    parsed_args[Valid_Args.ROLE] = arg
                 case "location":
-                    parsed_args[Columns.LOCATION] = arg
+                    parsed_args[Valid_Args.LOCATION] = arg
                 case "level":
-                    parsed_args[Columns.LEVEL] = arg
+                    parsed_args[Valid_Args.LEVEL] = arg
                 case "count":
-                    parsed_args[Columns.COUNT] = arg
+                    parsed_args[Valid_Args.COUNT] = arg
             current_arg_type = None
     logger.info(f'Parsed args: {parsed_args}')
     return tuple(parsed_args)

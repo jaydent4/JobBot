@@ -5,7 +5,7 @@ from logging_config import setup_logging
 import pandas as pd
 from .args import validate, parse
 import time
-from const import ARG_TYPES, Columns
+from const import ARG_TYPES, Columns, Valid_Args
 
 # dB contains repeats (marked in the repost col)
 
@@ -183,8 +183,8 @@ class Manager:
         parsed_args = parse(args)
         
         count = 1 # default return 1 jobposting from query
-        if parsed_args[Columns.COUNT] is not None:
-            count = parsed_args[Columns.COUNT]
+        if parsed_args[Valid_Args.COUNT] is not None:
+            count = parsed_args[Valid_Args.COUNT]
 
     #      "--time",
     # "--company"
@@ -194,10 +194,16 @@ class Manager:
     # "--count"
 
         query_str = "SELECT * FROM jobPostings"
-
+        time_str = ""
+        company_str = ""
+        role_str = ""
+        loc_str = ""
+        level_str = ""
         count_str = "LIMIT " + str(count) # put this at the very end of the string
 
+        
 
+        # finding the first valid arg and putting where in front, rest gets ANDS
 
         # what if we construct the query string from scratch
         # componenets and then if componenets exist then we add it to the string and see how that works out
