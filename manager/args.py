@@ -1,5 +1,7 @@
 from logging_config import setup_logging
 from const import ARG_TYPES, Columns, Valid_Args
+from const import ARG_TYPES, Columns
+from datetime import date, timedelta
 
 logger = setup_logging("args", "ERROR", "ERROR", "args.log")
 
@@ -58,20 +60,22 @@ def parse(args) -> tuple:
         else:
             match current_arg_type:
                 case "time":
-                    parsed_args[Valid_Args.TIME] = arg
+                    parsed_args[Columns.TIME_POSTED] = ("time_posted", count_days(arg))
                 case "company":
-                    parsed_args[Valid_Args.COMPANY] = arg
+                    parsed_args[Columns.COMPANY_NAME] = ("company_name", arg)
                 case "role":
-                    parsed_args[Valid_Args.ROLE] = arg
+                    parsed_args[Columns.ROLE] = ("role", arg)
                 case "location":
-                    parsed_args[Valid_Args.LOCATION] = arg
-                case "level":
-                    parsed_args[Valid_Args.LEVEL] = arg
-                case "count":
-                    parsed_args[Valid_Args.COUNT] = arg
+                    parsed_args[Columns.LOCATION] = ("location", arg)
             current_arg_type = None
     logger.info(f'Parsed args: {parsed_args}')
     return tuple(parsed_args)
+
+def count_days(time) -> str:
+    today = date.today()
+    days_to_subtract = -time
+    past_date = today + timedelta(days=days_to_subtract)
+    return past_date.strftime('%Y-%m-%d')
                 
                 
 
