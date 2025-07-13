@@ -22,7 +22,7 @@ intents.members = True
 
 bot = commands.Bot(command_prefix='!', intents=intents)
 
-manager = Manager()
+manager = Manager(config.sources)
 assert(0)
 @bot.event
 async def on_ready():
@@ -67,7 +67,7 @@ Returns:
 @bot.command()
 async def job(ctx, *args): # args is a tuple
     # use args to query
-    queryResults = manager.getData(args)
+    queryResults: list[tuple] = manager.getData(args)
     # sends msg to discord
     await ctx.send(f"[insert embedding created using info from manager]")
 

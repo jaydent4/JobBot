@@ -4,11 +4,13 @@ ARG_TYPES = {
     "--time",
     "--company"
     "--role",
-    "--location"
+    "--location",
+    "--level",
+    "--count"
 }
 
 class Columns(Enum):
-    ARGS_SIZE = 10
+    ARGS_SIZE = 12
     ID = 0
     COMPANY_NAME = 1
     ROLE = 2
@@ -19,3 +21,5 @@ class Columns(Enum):
     DATE_SCRAPED = 7
     TIME_SCRAPED = 8
     SCRAPED_SOURCES = 9
+    LEVEL = 10
+    COUNT = 11

@@ -7,10 +7,10 @@ logger = setup_logging("args", "ERROR", "ERROR", "args.log")
 validates arguments
 Args:
     args: tuple, arguments passed from discord bot
+
 Returns:
     bool
 """
-
 def validate(args) -> bool:
     if not args:
         logger.error('no args were provided')
@@ -51,21 +51,23 @@ Returns:
 """
 def parse(args) -> tuple:
     parsed_args = [None] * Columns.ARGS_SIZE
+    args = [arg for arg in args if arg.startswith("--")]
     current_arg_type = None
     for arg in args:
-        if arg.startswith("--"):
-            current_arg_type = arg[2:]
-        else:
-            match current_arg_type:
-                case "time":
-                    parsed_args[Columns.TIME_POSTED] = arg
-                case "company":
-                    parsed_args[Columns.COMPANY_NAME] = arg
-                case "role":
-                    parsed_args[Columns.ROLE] = arg
-                case "location":
-                    parsed_args[Columns.LOCATION] = arg
-            current_arg_type = None
+        match current_arg_type:
+            case "time":
+                parsed_args[Columns.TIME_POSTED] = arg
+            case "company":
+                parsed_args[Columns.COMPANY_NAME] = arg
+            case "role":
+                parsed_args[Columns.ROLE] = arg
+            case "location":
+                parsed_args[Columns.LOCATION] = arg
+            case "level":
+                parsed_args[Columns.LEVEL] = arg
+            case "count":
+                parsed_args[Columns.COUNT] = arg
+        current_arg_type = None
     logger.info(f'Parsed args: {parsed_args}')
     return tuple(parsed_args)
                 

@@ -3,8 +3,9 @@ from config import Config
 import importlib
 from logging_config import setup_logging
 import pandas as pd
-from args import validate, parse
+from .args import validate, parse
 import time
+from const import ARG_TYPES, Columns
 
 # dB contains repeats (marked in the repost col)
 
@@ -38,21 +39,21 @@ class Manager:
                         company_name TEXT NOT NULL, 
                         role TEXT NOT NULL, 
                         location TEXT NOT NULL, 
-                        application_link TEXT NOT NULL, 
+                        application_link TEXT, 
                         date_posted DATE NOT NULL,
-                        time_posted TIME NOT NULL, 
+                        time_posted TIME, 
                         date_scraped DATE NOT NULL,
                         time_scraped TIME NOT NULL, 
-                        scrape_source TEXT NOT NULL
+                        scrape_source TEXT NOT NULL,
+                        level TEXT NOT NULL
                         );"""
                 )
 
-                # commit the changes
                 self.conn.commit()
 
-                print("Table created successfully.")
+                print("Table exists.")
         except sqlite3.OperationalError as e:
-            print("Failed to", e)
+            print("Failed to create table because:", e)
 
         # TRYING TO LOAD FAKE DATA AND INSERT INTO DB, IT WORKS BTW
         data = pd.read_csv("./manager/fake_data.csv")
@@ -60,7 +61,7 @@ class Manager:
         data = data.values.tolist()
 
         try:
-            self.cur.executemany("INSERT INTO jobPostings VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data)
+            self.cur.executemany("INSERT INTO jobPostings VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data)
             self.conn.commit()
             print('hi') # when its in db it won't insert it again (hi does not get printed)
         except Exception as e:
@@ -89,7 +90,7 @@ class Manager:
     """
     Attempt to load all scrapers from configurations
     """
-    def load_scrapers(self):
+    def load_scrapers(self) -> None:
         for name in self.sources:
             module_name = "scrapers." + name.lower()
             try:
@@ -118,20 +119,20 @@ class Manager:
         None
 
     Returns:
-        dict: containing unique job postings from all scrapers
+        list[tuple]: containing job postings from all scrapers
     """
-    def run_scrapers(self):
-        result = {}
+    def run_scrapers(self) -> list[tuple]:
+        result = []
         for name in self.scrapers.keys():
             start_time = time.time()
             scraper_result = self.scrape(name)
             end_time = time.time()
             elapsed_time = end_time - start_time
             if not scraper_result:
-                result[name] = "SCRAPER DOES NOT EXIST"
+                self.logger.error(f"SCARPER {name} DOES NOT EXIST")
             else:
                 self.performance_logger.info(f'Scraper {name} took {elapsed_time:.4f} seconds to run')
-            result[name] = scraper_result
+                result.extend(scraper_result)
         return result
 
 
@@ -141,14 +142,14 @@ class Manager:
         None
 
     Returns:
-        (tuple[bool, dict]): bool is true if dB updated, bool is false if dB did not update, dict is the dictionary of new postings
+        (tuple[bool, tuple]): bool is true if dB updated, bool is false if dB did not update, list containing tuple where each tuple is a jobposting
     """
-    def update(self):
-        newPostings = self.run_scrapers()
+    def update(self) -> tuple[bool, list[tuple] | None]:
+        new_postings = self.run_scrapers()
         # cache would be updated somewhere in this method
-        if len(newPostings) > 0:
-            self.updateDB()
-            return (True, newPostings)
+        if len(new_postings) > 0:
+            self.update_DB(new_postings)
+            return (True, new_postings)
         else:
             return (False, None)
         
@@ -163,9 +164,9 @@ class Manager:
     Returns:
         None
     """
-    def update_DB(self, jobpostings: list[tuple]) -> None:
+    def update_DB(self, job_postings: list[tuple]) -> None:
         try:
-            self.cur.executemany("INSERT INTO jobPostings VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)", jobpostings)
+            self.cur.executemany("INSERT INTO jobPostings VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", job_postings)
             self.conn.commit()
         except Exception as e:
             self.logger.error(f"Something errored while inserting scrapped job postings into the main database: {e}")
@@ -174,17 +175,20 @@ class Manager:
     """
     Doc strings
     """
-    def get_data(self, args: tuple):
+    def get_data(self, args: tuple) -> list[tuple] | None:
         
         if not validate(args):
-            return tuple()
+            return None
         
         parsed_args = parse(args)
-
+        
+        count = 1 # default return 1 jobposting from query
+        if parsed_args[Columns.COUNT] is not None:
+            count = parsed_args[Columns.COUNT]
 
         # if there is a time argument like -time 5 days, need to calculate what that new date is from today's date
 
-        # how do we not have like 10! cases...
+        # how do we not have like 6! cases...
         # https://codedamn.com/news/sql/how-to-write-multiple-where-conditions-in-sql
         # https://docs.python.org/3/library/sqlite3.html
 
@@ -196,7 +200,7 @@ class Manager:
         # lists all postings in the last 10 days (default of --time 10 d)
 
         # personally i think its more useful for user to query the bot rather than have bot maintain info about which user wants what-
-        pass
+        return None
 
 
 
