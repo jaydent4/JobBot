@@ -2,7 +2,7 @@ from enum import Enum
 
 ARG_TYPES = {
     "--time",
-    "--company"
+    "--company",
     "--role",
     "--location",
     "--level",

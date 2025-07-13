@@ -20,15 +20,12 @@ def validate(args) -> bool:
     
     current_arg_type = None
     for arg in args:
-        if not current_arg_type and not arg.startswith("--"):
-            logger.error('arg found with no matching arg type')
+        if current_arg_type == None and arg.startswith("--") and arg not in ARG_TYPES:
+            logger.error(f'arg found with no matching arg type {arg}')
             return False
-        if current_arg_type and arg.startswith("--"):
+        if current_arg_type != None and arg.startswith("--"):
             logger.error('arg type cannot be passed as an argument')
             return False
-        if not current_arg_type and arg.startswith("--") and arg not in ARG_TYPES:
-            logger.error('arg type is invalid') 
-            return False       
 
 
         # sorry this code looks so ugly 
@@ -51,7 +48,7 @@ Args:
 Returns:
     tuple
 """
-def parse(args) -> tuple:
+def parse(args):
     parsed_args = [None] * Valid_Args.SIZE
     current_arg_type = None
     for arg in args:
@@ -72,6 +69,7 @@ def parse(args) -> tuple:
                 case "count":
                     parsed_args[Valid_Args.COUNT] = ("count", arg)
             current_arg_type = None
+    logger.error(f"hiii this is parse {parsed_args}")
     logger.info(f'Parsed args: {parsed_args}')
     return tuple(parsed_args)
 

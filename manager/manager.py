@@ -207,11 +207,11 @@ class Manager:
         (list[tuple]): a list of jobpostings; each post is a tuple in the list
     """
     def get_data(self, args: tuple) -> list[tuple] | None:
-        print(args)
         if not validate(args):
             return None
-        
+        self.logger.error(f"passed validation")
         parsed_args = parse(args)
+        self.logger.error(f"passed parseing")
         assert(len(parsed_args) == 6)
         
         count = 1 # default return 1 jobposting from database
