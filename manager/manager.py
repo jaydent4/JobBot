@@ -108,6 +108,7 @@ class Manager:
     """
     def scrape(self, name) -> list[tuple] | None:
         if not self.scrapers[name]:
+            self.logger.error(f'Scraper for {name} does not exist')
             return None
         return self.scrapers[name].scrape()
 

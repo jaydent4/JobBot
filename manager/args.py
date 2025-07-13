@@ -86,6 +86,7 @@ def parse(args) -> tuple:
                 case "location":
                     parsed_args[LOCATION] = arg
             current_arg_type = None
+    logger.info(f'Parsed args: {parsed_args}')
     return tuple(parsed_args)
                 
                 
