@@ -182,31 +182,6 @@ class Manager:
         # personally i think its more useful for user to query the bot rather than have bot maintain info about which user wants what-
         pass
 
-    
-    """
-    Parses arguments into a dictionary
-    Args:
-        args (tuple): tuple of arguments passed from discord bot
-    
-    Returns:
-        dict: arguments parsed into a dictionary, None if arguments are invalid
-    """
-    # temporary arg parser, will fix later
-    def parse_args(self, args: tuple) -> dict:
-        parsed_args = {}
-        arg_type = None
-        for arg in args:
-            if not arg_type and arg.startswith("--"):
-                arg_type = arg[2:]
-            elif arg_type and not arg.startswith("--"):
-                parsed_args[arg_type] = arg
-                arg_type = None
-            else:
-                self.logger.error(f' {arg_type}: {arg} is an invalid argument')
-                return None
-        return parsed_args
-
-        
 
 
         
