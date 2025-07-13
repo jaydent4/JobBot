@@ -22,17 +22,19 @@ class GITHUBScraper(ScraperBase):
 
         job_tables = doc.find_all("table")
         job_data = []
+        date_ranges = ["0d", "1d", "2d"]
 
         for table in job_tables[1:]:
             tbody = table.find("tbody")
-            # print(tbody)
-            # print()
-
             rows = tbody.find_all("tr")
+
             for row in rows:
                 cols = row.find_all("td")
                 job_info = tuple(col.get_text(strip=True) for col in cols)
 
+                if job_info[3] == "🔒" or job_info[4] not in date_ranges:
+                    continue
+                
                 job_data.append(job_info)
 
         for job in job_data[:60]:
