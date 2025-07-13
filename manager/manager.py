@@ -82,7 +82,7 @@ class Manager:
         #                                """)
         queryResult = self.cur.execute("""SELECT * FROM jobPostings 
                                        WHERE company_name in ('amazon')
-                                       AND role = 'ML'
+                                       WHERE role = 'ML'
                                        """)
         for row in queryResult:
             print(row)
@@ -185,6 +185,11 @@ class Manager:
         count = 1 # default return 1 jobposting from query
         if parsed_args[Columns.COUNT] is not None:
             count = parsed_args[Columns.COUNT]
+
+        query_str = "SELECT * FROM "
+        count_str = "LIMIT "
+        # what if we construct the query string from scratch
+        # componenets and then if componenets exist then we add it to the string and see how that works out
 
         # if there is a time argument like -time 5 days, need to calculate what that new date is from today's date
 
