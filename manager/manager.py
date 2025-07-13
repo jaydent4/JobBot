@@ -4,6 +4,7 @@ import importlib
 from logging_config import setup_logging
 import pandas as pd
 from args import validate, parse
+import time
 
 # dB contains repeats (marked in the repost col)
 
@@ -11,7 +12,7 @@ class Manager:
     def __init__(self, sources):
          # sets up logger
         self.logger = setup_logging("Manager", "INFO", "INFO", "manager.log")
-        print(self.logger)
+        self.performance_logger = setup_logging("Manager-performance", "INFO", "INFO", "performance.log")
 
         self.sources = sources
         #print(self.sources)
