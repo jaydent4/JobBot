@@ -31,7 +31,7 @@ def validate(args) -> bool:
             return False       
 
 
-        # sorry this code looks so ugly
+        # sorry this code looks so ugly 
         if arg.startswith("--"):
             current_arg_type = arg
         else:

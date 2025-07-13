@@ -207,6 +207,7 @@ class Manager:
         (list[tuple]): a list of jobpostings; each post is a tuple in the list
     """
     def get_data(self, args: tuple) -> list[tuple] | None:
+        print(args)
         if not validate(args):
             return None
         

@@ -23,7 +23,7 @@ intents.members = True
 bot = commands.Bot(command_prefix='!', intents=intents)
 
 manager = Manager(config.sources)
-assert(0)
+
 @bot.event
 async def on_ready():
     print(f"{bot.user.name} is working")
@@ -60,14 +60,14 @@ Args:
         note: (we could do states too)
     --comp [insert company name]: company of interst.
         ex: --comp amazon
-
+0
 Returns:
     None
 """
 @bot.command()
 async def job(ctx, *args): # args is a tuple
     # use args to query
-    query_results: list[tuple] = manager.getData(args)
+    query_results = manager.get_data(args)
     # sends msg to discord
     await ctx.send(f"{query_results}")
 
