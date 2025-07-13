@@ -12,35 +12,49 @@ class GITHUBScraper(ScraperBase):
         args: cls
     
     Returns:
-        not sure yet
+        List of tuples
     """
     @classmethod
-    def scrape(cls):
+    def scrape(cls) -> list[tuple]:
         url = "https://github.com/SimplifyJobs/Summer2026-Internships"
         result = requests.get(url).text
         doc = BeautifulSoup(result, "html.parser")
 
         job_tables = doc.find_all("table")
         job_data = []
-        date_ranges = ["0d", "1d", "2d"]
 
         for table in job_tables[1:]:
             tbody = table.find("tbody")
             rows = tbody.find_all("tr")
 
+            prev_company = None
             for row in rows:
+                current_job_data = []
                 cols = row.find_all("td")
-                job_info = tuple(col.get_text(strip=True) for col in cols)
 
-                if job_info[3] == "🔒" or job_info[4] not in date_ranges:
-                    continue
-                
-                job_data.append(job_info)
+                for i, col in enumerate(cols):
+                    col_text = col.get_text(strip=True)
+                    if i == 3:
+                        continue
+                    current_job_data.append(col_text)
 
-        for job in job_data[:60]:
-            print(job)
+                if current_job_data[0].replace(" ", "").isalnum():
+                    prev_company = current_job_data[0]
+                else:
+                    current_job_data[0] = prev_company
+
+                if cls.filter_date(current_job_data):
+                    job_info = tuple(current_job_data)
+                    job_data.append(job_info)
 
 
+    @staticmethod
+    def filter_date(job_data) -> bool:
+        date_ranges = ["0d", "1d", "2d"]
+        if job_data[3] not in date_ranges:
+            return False
+        return True
 
-if __name__ == "__main__":
-    GITHUBScraper.scrape()
+
+# if __name__ == "__main__":
+#     GITHUBScraper.scrape()
