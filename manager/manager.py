@@ -122,8 +122,11 @@ class Manager:
     def run_scrapers(self):
         result = {}
         for name in self.scrapers.keys():
-            result[name] = self.scrape(name)
-        return set(result) # ensuring uniqueness
+            scraper_result = self.scrape(name)
+            if not scraper_result:
+                result[name] = "SCRAPER DOES NOT EXIST"
+            result[name] = scraper_result
+        return result
 
 
     """
