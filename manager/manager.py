@@ -82,7 +82,7 @@ class Manager:
         #                                """)
         queryResult = self.cur.execute("""SELECT * FROM jobPostings 
                                        WHERE company_name in ('amazon')
-                                       WHERE role = 'ML'
+                                       AND role = 'ML'
                                        """)
         for row in queryResult:
             print(row)
@@ -186,8 +186,19 @@ class Manager:
         if parsed_args[Columns.COUNT] is not None:
             count = parsed_args[Columns.COUNT]
 
-        query_str = "SELECT * FROM "
-        count_str = "LIMIT "
+    #      "--time",
+    # "--company"
+    # "--role",
+    # "--location",
+    # "--level",
+    # "--count"
+
+        query_str = "SELECT * FROM jobPostings"
+
+        count_str = "LIMIT " + str(count) # put this at the very end of the string
+
+
+
         # what if we construct the query string from scratch
         # componenets and then if componenets exist then we add it to the string and see how that works out
 
