@@ -19,6 +19,7 @@ def validate(args) -> bool:
         return False
     if len(args) % 2 != 0:
         logger.error('some args or arg types are not matched')
+        return False
 
     for i in range(0, len(args) - 1, 2):
         arg_type = args[i]
