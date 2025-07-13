@@ -17,31 +17,27 @@ def validate(args) -> bool:
     if not args:
         logger.error('no args were provided')
         return False
-    
-    current_arg_type = None
-    for arg in args:
-        if not current_arg_type and not arg.startswith("--"):
-            logger.error('arg found with no matching arg type')
-            return False
-        if current_arg_type and arg.startswith("--"):
-            logger.error('arg type cannot be passed as an argument')
-            return False
-        if not current_arg_type and arg.startswith("--") and arg not in ARG_TYPES:
-            logger.error('arg type is invalid') 
-            return False       
+    if len(args) % 2 != 0:
+        logger.error('some args or arg types are not matched')
 
+    for i in range(len(args) - 1):
+        arg_type = args[i]
+        arg = args[i + 1]
 
-        # sorry this code looks so ugly 
-        if arg.startswith("--"):
-            current_arg_type = arg
-        else:
-            if current_arg_type == "--time":
-                if not arg.isdigit():
-                    logger.error('arg of arg type \'--time\' must be a valid integer')
-                    return False
-                if int(args) < 0:
-                    logger.error('arg of arg type \'--time\' must be greater than 0')
-                    return False
+        if not arg_type.startswith("--"):
+            logger.error('arg type must start with \'--\'')
+            return False
+        if arg_type not in ARG_TYPES:
+            logger.error(f'arg type {arg_type} does not exist')
+            return False
+        
+        if arg_type == "--time":
+            if not arg.isdigit():
+                logger.error('arg of arg_type \'--time\' must be a valid integer')
+                return False
+            if int(arg) < 0:
+                logger.error('arg of arg_type \'--time\' must be greater than or equal to 0')
+                return False
     return True
 
 """
