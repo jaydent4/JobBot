@@ -1,0 +1,21 @@
+from enum import Enum
+
+ARG_TYPES = {
+    "--time",
+    "--company"
+    "--role",
+    "--location"
+}
+
+class Columns(Enum):
+    ARGS_SIZE = 10
+    ID = 0
+    COMPANY_NAME = 1
+    ROLE = 2
+    LOCATION = 3
+    APPLICATION_LINK = 4
+    DATE_POSTED = 5
+    TIME_POSTED = 6
+    DATE_SCRAPED = 7
+    TIME_SCRAPED = 8
+    SCRAPED_SOURCES = 9

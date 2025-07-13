@@ -123,9 +123,14 @@ class Manager:
     def run_scrapers(self):
         result = {}
         for name in self.scrapers.keys():
+            start_time = time.time()
             scraper_result = self.scrape(name)
+            end_time = time.time()
+            elapsed_time = end_time - start_time
             if not scraper_result:
                 result[name] = "SCRAPER DOES NOT EXIST"
+            else:
+                self.performance_logger.info(f'Scraper {name} took {elapsed_time:.4f} seconds to run')
             result[name] = scraper_result
         return result
 
