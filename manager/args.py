@@ -26,7 +26,7 @@ def validate(args) -> bool:
         if current_arg_type and arg.startswith("--"):
             logger.error('arg type cannot be passed as an argument')
             return False
-        if arg.startswith("--") and arg not in ARG_TYPES:
+        if not current_arg_type and arg.startswith("--") and arg not in ARG_TYPES:
             logger.error('arg type is invalid') 
             return False       
 
