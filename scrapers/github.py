@@ -1,4 +1,4 @@
-from scrapers.base import ScraperBase
+from base import ScraperBase
 import requests
 from bs4 import BeautifulSoup
 
@@ -12,8 +12,7 @@ class GITHUBScraper(ScraperBase):
         result = requests.get(url).text
         doc = BeautifulSoup(result, "html.parser")
 
-        job_tables = doc.find('markdown-accessibility-table')  
-
+        job_tables = doc.find_all("markdown-accessiblity-table")
         print(job_tables)
 
 
