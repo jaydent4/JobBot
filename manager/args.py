@@ -39,6 +39,7 @@ def validate(args) -> bool:
             if int(arg) < 0:
                 logger.error('arg of arg_type \'--time\' must be greater than or equal to 0')
                 return False
+    logger.error("valid")
     return True
 
 """
@@ -48,26 +49,28 @@ Args:
 Returns:
     tuple
 """
-def parse(args):
-    parsed_args = [None] * Valid_Args.SIZE
+def parse(args: tuple):
+    parsed_args = [None] * Valid_Args.SIZE.value
     current_arg_type = None
     for arg in args:
         if arg.startswith("--"):
+            logger.error("hii")
             current_arg_type = arg[2:]
         else:
+            logger.error("bye")
             match current_arg_type:
                 case "time":
-                    parsed_args[Valid_Args.TIME] = ("time_posted", count_days(arg))
+                    parsed_args[Valid_Args.TIME.value] = ("time_posted", count_days(arg))
                 case "company":
-                    parsed_args[Valid_Args.COMPANY] = ("company_name", arg)
+                    parsed_args[Valid_Args.COMPANY.value] = ("company_name", arg)
                 case "role":
-                    parsed_args[Valid_Args.ROLE] = ("role", arg)
+                    parsed_args[Valid_Args.ROLE.value] = ("role", arg)
                 case "location":
-                    parsed_args[Valid_Args.LOCATION] = ("location", arg)
+                    parsed_args[Valid_Args.LOCATION.value] = ("location", arg)
                 case "level":
-                    parsed_args[Valid_Args.LEVEL] = ("level", arg)
+                    parsed_args[Valid_Args.LEVEL.value] = ("level", arg)
                 case "count":
-                    parsed_args[Valid_Args.COUNT] = ("count", arg)
+                    parsed_args[Valid_Args.COUNT.value] = ("count", arg)
             current_arg_type = None
     logger.error(f"hiii this is parse {parsed_args}")
     logger.info(f'Parsed args: {parsed_args}')

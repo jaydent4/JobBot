@@ -68,8 +68,8 @@ Returns:
 async def job(ctx, *args): # args is a tuple
     # use args to query
     query_results = manager.get_data(args)
-    # sends msg to discord
-    await ctx.send(f"{query_results}")
+    for row in query_results:
+        await ctx.send(f"{row}")
 
 
 bot.run(token, log_handler=handler, log_level=logging.DEBUG)

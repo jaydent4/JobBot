@@ -2,6 +2,7 @@ import sqlite3
 import importlib
 from logging_config import setup_logging
 from .args import validate, parse
+import pandas as pd
 import time
 from const import Valid_Args
 
@@ -26,12 +27,12 @@ class Manager:
 
         # following: https://docs.python.org/3/library/sqlite3.html
         try:
-            with sqlite3.connect('job.db') as self.conn:
+            with sqlite3.connect('./job.db') as self.conn:
                 self.cur = self.conn.cursor()
 
                 # creates a dB if there isn't one yet; opens existing dB if there is
                 self.cur.execute(
-                    """ CREATE TABLE IF NOT EXISTS jobPostings(
+                    """ CREATE TABLE IF NOT EXISTS jobPostings (
                         id INTEGER PRIMARY KEY, 
                         company_name TEXT NOT NULL, 
                         role TEXT NOT NULL, 
@@ -52,20 +53,20 @@ class Manager:
         except sqlite3.OperationalError as e:
             print("Failed to create table because:", e)
 
-        # # TRYING TO LOAD FAKE DATA AND INSERT INTO DB, IT WORKS BTW
-        # data = pd.read_csv("./manager/fake_data.csv")
-        # print(data)
-        # data = data.values.tolist()
+        # TRYING TO LOAD FAKE DATA AND INSERT INTO DB, IT WORKS BTW
+        data = pd.read_csv("./manager/fake_data.csv")
+        print(data)
+        data = data.values.tolist()
 
-        # try:
-        #     self.cur.executemany("INSERT INTO jobPostings VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data)
-        #     self.conn.commit()
-        #     print('hi') # when its in db it won't insert it again (hi does not get printed)
-        # except Exception as e:
-        #     self.logger.error(f"Something errored while inserting scrapped job postings into the main database: {e}")
+        try:
+            self.cur.executemany("INSERT INTO jobPostings VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data)
+            self.conn.commit()
+            print('hi') # when its in db it won't insert it again (hi does not get printed)
+        except Exception as e:
+            self.logger.error(f"Something errored while inserting scrapped job postings into the main database: {e}")
  
-        # for row in self.cur.execute("SELECT * FROM jobPostings ORDER BY id"):
-        #     print(row)
+        for row in self.cur.execute("SELECT * FROM jobPostings ORDER BY id"):
+            print(row)
         
         # # need to calculate today's date and the input argument ex: --time 5 day and then input that somehow as a query to sql
 
@@ -206,31 +207,41 @@ class Manager:
     Returns:
         (list[tuple]): a list of jobpostings; each post is a tuple in the list
     """
-    def get_data(self, args: tuple) -> list[tuple] | None:
+    def get_data(self, args: tuple):
         if not validate(args):
             return None
+        
         self.logger.error(f"passed validation")
         parsed_args = parse(args)
         self.logger.error(f"passed parseing")
-        assert(len(parsed_args) == 6)
-        
+
         count = 1 # default return 1 jobposting from database
-        if parsed_args[Valid_Args.COUNT] is not None:
-            count = parsed_args[Valid_Args.COUNT][1]
+        if parsed_args[Valid_Args.COUNT.value] is not None:
+            count = parsed_args[Valid_Args.COUNT.value][1]
 
         base_str = "SELECT * FROM jobPostings WHERE "
+        counter = 0
+        intersect = " INTERSECT "
         final_query_str = ""
-        count_str = "LIMIT " + str(count) # put this at the very end of the string
-
+        count_str = " LIMIT " + str(count) # put this at the very end of the string
+        self.logger.error(f"count str is: {count_str}")
         operator = ">=" # the start arg is time, its a >= comparison
         for i in range(len(parsed_args) - 1):
             arg_val = parsed_args[i]
+            self.logger.error(f"index: {i}, val: {arg_val}")
             if arg_val != None:
-                query_str = base_str + f"{arg_val[0]} " + operator + f" \'{arg_val[1]}\' INTERSECT "
+                query_str = base_str + f"{arg_val[0]} " + operator + f" \'{arg_val[1]}\'"
+                
+                if counter % 2 != 0:
+                    query_str = intersect + query_str
+                counter += 1
                 final_query_str += query_str
-                print(final_query_str) # debug
+                self.logger.error(f"{final_query_str}") # debug
             operator = "=" # all other args are equality comparsions
-
-        return self.cur.execute(final_query_str + count_str)
+        self.logger.error(f"{final_query_str + count_str}")
+        res = self.cur.execute(final_query_str + count_str)
+        for row in res:
+            self.logger.error(f"{row}")
+        return None
     
 
