@@ -3,6 +3,7 @@ from config import Config
 import importlib
 from logging_config import setup_logging
 import pandas as pd
+from args import validate, parse
 
 # dB contains repeats (marked in the repost col)
 
@@ -164,8 +165,13 @@ class Manager:
     Doc strings
     """
     def get_data(self, args: tuple):
-        # parse args
-        self.parse_args(args)
+        
+        if not validate(args):
+            return tuple()
+        
+        parsed_args = parse(args)
+
+
         # if there is a time argument like -time 5 days, need to calculate what that new date is from today's date
 
         # how do we not have like 10! cases...
