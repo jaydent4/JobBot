@@ -90,6 +90,12 @@ class Manager:
         # for row in q:
         #     print(row)
 
+        # job = [("8","nvidia","EE","LA","https://www.amazon.com/","NONE","NONE","15 Jun 2000","10:30","github","intern")]
+        # self.update_DB(job)
+        # print("------")
+        # for row in self.cur.execute("SELECT * FROM jobPostings ORDER BY id"):
+        #     print(row)
+
 
     """
     Attempt to load all scrapers from configurations
@@ -131,6 +137,7 @@ class Manager:
         for name in self.scrapers.keys():
             start_time = time.time()
             scraper_result = self.scrape(name)
+            # need to parse out Nones for NULLS before insertion
             end_time = time.time()
             elapsed_time = end_time - start_time
             if not scraper_result:
