@@ -9,7 +9,6 @@ from const import Valid_Args
 
 class Manager:
     def __init__(self, sources):
-         # sets up logger
         self.logger = setup_logging("Manager", "INFO", "INFO", "manager.log")
         self.performance_logger = setup_logging("Manager-performance", "INFO", "INFO", "performance.log")
 
@@ -22,10 +21,6 @@ class Manager:
         # loads all the scrapers
         self.load_scrapers()
 
-        
-        # we can have another dB act as cachce? but how do we ensure temporal and spacial locality?
-
-        # following: https://docs.python.org/3/library/sqlite3.html
         try:
             with sqlite3.connect('./job.db') as self.conn:
                 self.cur = self.conn.cursor()
@@ -54,20 +49,16 @@ class Manager:
             print("Failed to create table because:", e)
 
         # TRYING TO LOAD FAKE DATA AND INSERT INTO DB, IT WORKS BTW
-        data = pd.read_csv("./manager/fake_data.csv")
-        print(data)
-        data = data.values.tolist()
+        # data = pd.read_csv("./manager/fake_data.csv")
+        # print(data)
+        # data = data.values.tolist()
+        # self.cur.executemany("INSERT INTO jobPostings VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data)
+        # self.conn.commit()
+        # print('hi') # when its in db it won't insert it again (hi does not get printed)
 
-        try:
-            self.cur.executemany("INSERT INTO jobPostings VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data)
-            self.conn.commit()
-            print('hi') # when its in db it won't insert it again (hi does not get printed)
-        except Exception as e:
-            self.logger.error(f"Something errored while inserting scrapped job postings into the main database: {e}")
- 
+        # prints out what is currently in the db
         for row in self.cur.execute("SELECT * FROM jobPostings ORDER BY id"):
             print(row)
-        
         # # need to calculate today's date and the input argument ex: --time 5 day and then input that somehow as a query to sql
 
         # print("------")
@@ -211,9 +202,11 @@ class Manager:
         if not validate(args):
             return None
         
-        self.logger.error(f"passed validation")
+        self.logger.info(f"validation stage passed")
+
         parsed_args = parse(args)
-        self.logger.error(f"passed parseing")
+
+        self.logger.info(f"parsing stage passed")
 
         count = 1 # default return 1 jobposting from database
         if parsed_args[Valid_Args.COUNT.value] is not None:
@@ -224,24 +217,26 @@ class Manager:
         intersect = " INTERSECT "
         final_query_str = ""
         count_str = " LIMIT " + str(count) # put this at the very end of the string
-        self.logger.error(f"count str is: {count_str}")
+
         operator = ">=" # the start arg is time, its a >= comparison
         for i in range(len(parsed_args) - 1):
             arg_val = parsed_args[i]
-            self.logger.error(f"index: {i}, val: {arg_val}")
+            
+            #self.logger.info(f"index: {i}, val: {arg_val}") # debug
+
             if arg_val != None:
                 query_str = base_str + f"{arg_val[0]} " + operator + f" \'{arg_val[1]}\'"
                 
                 if counter % 2 != 0:
                     query_str = intersect + query_str
+
                 counter += 1
                 final_query_str += query_str
-                self.logger.error(f"{final_query_str}") # debug
+
+                self.logger.info(f"final query currently is: \n{final_query_str}") # debug
             operator = "=" # all other args are equality comparsions
-        self.logger.error(f"{final_query_str + count_str}")
-        res = self.cur.execute(final_query_str + count_str)
-        for row in res:
-            self.logger.error(f"{row}")
-        return None
+
+        self.logger.info(f"final query is \n{final_query_str + count_str}") # debug
+        return  self.cur.execute(final_query_str + count_str)
     
 

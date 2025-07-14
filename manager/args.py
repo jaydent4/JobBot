@@ -54,10 +54,8 @@ def parse(args: tuple):
     current_arg_type = None
     for arg in args:
         if arg.startswith("--"):
-            logger.error("hii")
             current_arg_type = arg[2:]
         else:
-            logger.error("bye")
             match current_arg_type:
                 case "time":
                     parsed_args[Valid_Args.TIME.value] = ("time_posted", count_days(arg))
@@ -72,7 +70,6 @@ def parse(args: tuple):
                 case "count":
                     parsed_args[Valid_Args.COUNT.value] = ("count", arg)
             current_arg_type = None
-    logger.error(f"hiii this is parse {parsed_args}")
     logger.info(f'Parsed args: {parsed_args}')
     return tuple(parsed_args)
 
