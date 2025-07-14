@@ -53,18 +53,25 @@ async def update():
 Fowards user query to manager and then sends a response to the discord channel
 
 Args:
-    --time int type: time scale of interest. 
+    --time [insert number of days]
         ex: !job --time 5
         note: we can add weeks/months
-        avaiable options: int interpreted as days from today
-    --location [insert location name]: location of interest. 
+        available options: int interpreted as days from today
+
+    --role [insert role's name]
+        ex: !job --role ML
+
+    --location [insert location name] 
         ex: !job --location menlo park 
         note: (we could do states too)
-    --company [insert company name]: company of interst.
+
+    --company [insert company name]
         ex: !job --company amazon
+
     --count [insert number]
         ex: !job --count 2
         available options: any int
+
     --level [insert level]
         ex: !job --level intern
         available options: intern
