@@ -54,23 +54,28 @@ Fowards user query to manager and then sends a response to the discord channel
 
 Args:
     --time int type: time scale of interest. 
-        ex: --time 5 days
+        ex: !job --time 5
         note: we can add weeks/months
-    --loc [insert location name]: location of interest. 
-        ex: --loc menlo park 
+        avaiable options: int interpreted as days from today
+    --location [insert location name]: location of interest. 
+        ex: !job --location menlo park 
         note: (we could do states too)
-    --comp [insert company name]: company of interst.
-        ex: --comp amazon
-0
+    --company [insert company name]: company of interst.
+        ex: !job --company amazon
+    --count [insert number]
+        ex: !job --count 2
+        available options: any int
+    --level [insert level]
+        ex: !job --level intern
+        available options: intern
 Returns:
     None
 """
 @bot.command()
 async def job(ctx, *args): # args is a tuple
-    # use args to query
     query_results = manager.get_data(args)
     for row in query_results:
-        print(row)
+        print(row) #debug print
         await ctx.send(embed=embed(row))
 
 
