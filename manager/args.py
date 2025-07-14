@@ -39,17 +39,17 @@ def validate(args) -> bool:
             if int(arg) < 0:
                 logger.error('arg of arg_type \'--time\' must be greater than or equal to 0')
                 return False
-    logger.error("valid")
+    logger.info("valid")
     return True
 
 """
-parses args in order of database columns
+parses args in order of valid args enum in const.py
 Args:
     args: tuple
 Returns:
     tuple
 """
-def parse(args: tuple):
+def parse(args):
     parsed_args = [None] * Valid_Args.SIZE.value
     current_arg_type = None
     for arg in args:
@@ -58,7 +58,7 @@ def parse(args: tuple):
         else:
             match current_arg_type:
                 case "time":
-                    parsed_args[Valid_Args.TIME.value] = ("time_posted", count_days(arg))
+                    parsed_args[Valid_Args.TIME.value] = ("date_posted", count_days(arg))
                 case "company":
                     parsed_args[Valid_Args.COMPANY.value] = ("company_name", arg)
                 case "role":
@@ -76,7 +76,7 @@ def parse(args: tuple):
 
 def count_days(time) -> str:
     today = date.today()
-    days_to_subtract = -time
+    days_to_subtract = -int(time)
     past_date = today + timedelta(days=days_to_subtract)
     return past_date.strftime('%Y-%m-%d')
                 

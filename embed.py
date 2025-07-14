@@ -1,7 +1,7 @@
 import discord 
 from const import Columns
 
-def embed(query):
+def embed(query:tuple) -> discord.Embed:
     id = replace_none(query[Columns.ID.value])
     company_name = replace_none(query[Columns.COMPANY_NAME.value])
     role = replace_none(query[Columns.ROLE.value])

@@ -70,7 +70,8 @@ async def job(ctx, *args): # args is a tuple
     # use args to query
     query_results = manager.get_data(args)
     for row in query_results:
-        await ctx.send(embed=embed(query_results))
+        print(row)
+        await ctx.send(embed=embed(row))
 
 
 bot.run(token, log_handler=handler, log_level=logging.DEBUG)

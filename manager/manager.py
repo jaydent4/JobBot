@@ -237,6 +237,6 @@ class Manager:
             operator = "=" # all other args are equality comparsions
 
         self.logger.info(f"final query is \n{final_query_str + count_str}") # debug
-        return  self.cur.execute(final_query_str + count_str)
+        return self.cur.execute(final_query_str + count_str)
     
 
