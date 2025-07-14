@@ -6,6 +6,7 @@ import os
 from manager.manager import Manager
 from logging_config import setup_logging
 from config import Config
+from embed import embed
 
 config = Config()
 
@@ -69,7 +70,7 @@ async def job(ctx, *args): # args is a tuple
     # use args to query
     query_results = manager.get_data(args)
     for row in query_results:
-        await ctx.send(f"{row}")
+        await ctx.send(embed=embed(query_results))
 
 
 bot.run(token, log_handler=handler, log_level=logging.DEBUG)
