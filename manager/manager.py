@@ -168,11 +168,13 @@ class Manager:
         None
     """
     def update_DB(self, job_postings: list[tuple]) -> None:
-        try:
-            self.cur.executemany("INSERT INTO jobPostings VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", job_postings)
-            self.conn.commit()
-        except Exception as e:
-            self.logger.error(f"Something errored while inserting scrapped job postings into the main database: {e}")
+        for job in job_postings:
+            try:
+                self.cur.execute("INSERT INTO jobPostings VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", job)
+                self.logger.info(f"succesfully inserted scrapped job: {job} into the database")
+                self.conn.commit()
+            except Exception as e:
+                self.logger.error(f"Something errored while inserting scrapped job {job} into the main database: {e}")
 
     
     """
@@ -198,7 +200,7 @@ class Manager:
     Returns:
         (list[tuple]): a list of jobpostings; each post is a tuple in the list
     """
-    def get_data(self, args: tuple):
+    def get_data(self, args: tuple) -> list[tuple] | None:
         if not validate(args):
             return None
         
