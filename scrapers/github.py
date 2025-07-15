@@ -32,21 +32,20 @@ class GITHUBScraper(ScraperBase):
                 current_job_data = []
                 cols = row.find_all("td")
 
-                for i, col in enumerate(cols):
-                    col_text = col.get_text(strip=True)
-                    if i == 3:
-                        continue
-                    current_job_data.append(col_text)
+                current_job_data = [col.get_text(strip=True) for i, col in enumerate(cols) if i != 3]
+
+                # checks if post date is within 0-2 days
+                if cls.filter_date(current_job_data):
+                    job_info = tuple(current_job_data)
+                    job_data.append(job_info)
+
 
                 if current_job_data[0].replace(" ", "").isalnum():
                     prev_company = current_job_data[0]
                 else:
                     current_job_data[0] = prev_company
 
-                if cls.filter_date(current_job_data):
-                    job_info = tuple(current_job_data)
-                    job_data.append(job_info)
-
+        print(job_data)
 
     @staticmethod
     def filter_date(job_data) -> bool:
@@ -56,5 +55,5 @@ class GITHUBScraper(ScraperBase):
         return True
 
 
-# if __name__ == "__main__":
-#     GITHUBScraper.scrape()
+if __name__ == "__main__":
+    GITHUBScraper.scrape()
