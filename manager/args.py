@@ -17,29 +17,27 @@ def validate(args) -> bool:
     if not args:
         logger.error('no args were provided')
         return False
-    if len(args) % 2 != 0:
-        logger.error('some args or arg types are not matched')
-        return False
-
-    for i in range(0, len(args) - 1, 2):
-        arg_type = args[i]
-        arg = args[i + 1]
-
-        if not arg_type.startswith("--"):
-            logger.error('arg type must start with \'--\'')
-            return False
-        if arg_type not in ARG_TYPES:
-            logger.error(f'arg type {arg_type} does not exist')
-            return False
-        
-        if arg_type == "--time":
-            if not arg.isdigit():
-                logger.error('arg of arg_type \'--time\' must be a valid integer')
+    
+    # sliding window to group args with arg types
+    left = 0
+    if not args[left].startswith("--"):
+        logger.error('no arg type provided')
+    
+    curr_args = []
+    curr_arg_type = args[left]
+    for right in range(1, len(args)):
+        if args[right].startswith("--"):
+            if len(curr_args) == 0:
+                logger.error(f'no args are provided with the arg type {curr_arg_type}')
                 return False
-            if int(arg) < 0:
-                logger.error('arg of arg_type \'--time\' must be greater than or equal to 0')
+            if curr_arg_type == "--time" and len(curr_args) > 1:
+                logger.error('too many args passed with arg type \'--time\'')
                 return False
-    logger.info("valid")
+            curr_arg_type = args[right]
+            left = right
+            curr_args = []
+        else:
+            curr_args.append(args[right])
     return True
 
 """
@@ -51,25 +49,32 @@ Returns:
 """
 def parse(args):
     parsed_args = [None] * Valid_Args.SIZE.value
-    current_arg_type = None
-    for arg in args:
-        if arg.startswith("--"):
-            current_arg_type = arg[2:]
-        else:
-            match current_arg_type:
-                case "time":
+    curr_arg_type = None
+    curr_args = []
+    
+    # sliding window to parse
+    left = 0
+    curr_arg_type = args[left]
+    for right in range(1, len(args)):
+        if args[right].startswith("--"):
+            arg = " ".join(curr_args)
+            match curr_arg_type:
+                case "--time":
                     parsed_args[Valid_Args.TIME.value] = ("date_posted", count_days(arg))
-                case "company":
+                case "--company":
                     parsed_args[Valid_Args.COMPANY.value] = ("company_name", arg)
-                case "role":
+                case "--role":
                     parsed_args[Valid_Args.ROLE.value] = ("role", arg)
-                case "location":
+                case "--location":
                     parsed_args[Valid_Args.LOCATION.value] = ("location", arg)
-                case "level":
+                case "--level":
                     parsed_args[Valid_Args.LEVEL.value] = ("level", arg)
-                case "count":
+                case "--count":
                     parsed_args[Valid_Args.COUNT.value] = ("count", arg)
-            current_arg_type = None
+            left = right
+            curr_arg_type = args[right]
+        else:
+            curr_args.append(args[right])
     logger.info(f'Parsed args: {parsed_args}')
     return tuple(parsed_args)
 
