@@ -118,11 +118,11 @@ class Manager:
     Returns:
         list[tuple]: each tuple is a separate job posting, each tuple must contain 10 elements in the order of the columns in the database; if the value canont be scraped, put None
     """
-    def scrape(self, name) -> list[tuple] | None:
+    def scrape(self, name, link) -> list[tuple] | None:
         if not self.scrapers[name]:
             self.logger.error(f'Scraper for {name} does not exist')
             return None
-        return self.scrapers[name].scrape()
+        return self.scrapers[name].scrape(link)
 
 
     """
@@ -136,10 +136,10 @@ class Manager:
         result: list[tuple] = []
         for name in self.scrapers.keys():
             start_time = time.time()
-            scraper_result = self.scrape(name)
+            scraper_result = self.scrape(name, self.sources[name])
             end_time = time.time()
             elapsed_time = end_time - start_time
-            if scraper_result != None:
+            if scraper_result == None:
                 self.logger.error(f"SCARPER {name} DOES NOT EXIST")
             else:
                 self.performance_logger.info(f'Scraper {name} took {elapsed_time:.4f} seconds to run')
