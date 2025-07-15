@@ -37,14 +37,13 @@ class GITHUBScraper(ScraperBase):
 
                 # checks if post date is within 0-2 days
                 if cls.filter_date(current_job_data):
+                    if current_job_data[0].replace(" ", "").isalnum():
+                        prev_company = current_job_data[0]
+                    else:
+                        current_job_data[0] = prev_company
+
                     job_info = tuple(current_job_data)
                     job_data.append(job_info)
-
-
-                if current_job_data[0].replace(" ", "").isalnum():
-                    prev_company = current_job_data[0]
-                else:
-                    current_job_data[0] = prev_company
 
         for i in job_data:
             print(i)
