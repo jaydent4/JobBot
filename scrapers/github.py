@@ -1,6 +1,7 @@
 from base import ScraperBase
 import requests
 from bs4 import BeautifulSoup
+from datetime import datetime
 
 class GITHUBScraper(ScraperBase):
     def __init__(self):
@@ -18,7 +19,7 @@ class GITHUBScraper(ScraperBase):
     def scrape(cls) -> list[tuple]:
         url = "https://github.com/SimplifyJobs/Summer2026-Internships"
         result = requests.get(url).text
-        doc = BeautifulSoup(result, "html.parser")
+        doc = BeautifulSoup(result, "lxml")
 
         job_tables = doc.find_all("table")
         job_data = []
@@ -45,7 +46,10 @@ class GITHUBScraper(ScraperBase):
                 else:
                     current_job_data[0] = prev_company
 
-        print(job_data)
+        for i in job_data:
+            print(i)
+            print()
+        # print(job_data)
 
     @staticmethod
     def filter_date(job_data) -> bool:
