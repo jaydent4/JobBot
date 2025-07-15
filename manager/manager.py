@@ -18,7 +18,6 @@ class Manager:
         # puts scrapers in dict[str, Obj] ex: github: GitHubScraper (object)
         self.scrapers = {}
 
-        # loads all the scrapers
         self.load_scrapers()
 
         try:
@@ -61,7 +60,7 @@ class Manager:
             print(row)
         # # need to calculate today's date and the input argument ex: --time 5 day and then input that somehow as a query to sql
 
-        # print("------")
+        print("------")
         # # checking queries, but how to make sure we dont' ahve 10! query cases?
         # # queryResult = self.cur.execute("""SELECT * FROM jobPostings 
         # #                                WHERE company_name = 'amazon' (side note: this also works: WHERE company_name in ('amazon'))
@@ -69,12 +68,12 @@ class Manager:
         # #                                AND date_posted > '2025-06-01'
         # #                                AND time_posted >= '01:04' (side note can also do: time_posted > '01:04:00.000')
         # #                                """)
-        # queryControl = self.cur.execute("""SELECT * FROM jobPostings 
-        #                                WHERE company_name in ('amazon')
-        #                                AND level = 'intern'
-        #                                """)
-        # for row in queryControl:
-        #     print(row)
+        queryControl = self.cur.execute("""SELECT * FROM jobPostings 
+                                       WHERE company_name = 'google'
+                                       LIMIT 1
+                                       """)
+        for row in queryControl:
+            print(row)
 
         # print("---")
         # s1 = """SELECT * FROM jobPostings
@@ -137,7 +136,6 @@ class Manager:
         for name in self.scrapers.keys():
             start_time = time.time()
             scraper_result = self.scrape(name)
-            # need to parse out Nones for NULLS before insertion
             end_time = time.time()
             elapsed_time = end_time - start_time
             if not scraper_result:
@@ -208,12 +206,22 @@ class Manager:
         (list[tuple]): a list of jobpostings; each post is a tuple in the list
     """
     def get_data(self, args: tuple) -> list[tuple] | None:
-        if not validate(args):
+        alphanum_args:list = []
+        for i in range(len(args)):
+            arg = args[i]
+            if arg.startswith('--'):
+                alphanum_args.append(arg)
+            else:
+                alphanum_args.append(''.join(ch for ch in arg if ch.isalnum()))
+        
+        self.logger.info(alphanum_args)
+
+        if not validate(tuple(alphanum_args)):
             return None
         
         self.logger.info(f"validation stage passed")
 
-        parsed_args = parse(args)
+        parsed_args = parse(tuple(alphanum_args))
 
         self.logger.info(f"parsing stage passed")
 
@@ -225,14 +233,12 @@ class Manager:
         counter = 0
         intersect = " INTERSECT "
         final_query_str = ""
-        count_str = " LIMIT " + str(count) # put this at the very end of the string
+        count_str = " LIMIT " + str(count)
 
-        operator = ">=" # the start arg is time, its a >= comparison
+        operator = ">="
         for i in range(len(parsed_args) - 1):
             arg_val = parsed_args[i]
             
-            #self.logger.info(f"index: {i}, val: {arg_val}") # debug
-
             if arg_val != None:
                 query_str = base_str + f"{arg_val[0]} " + operator + f" \'{arg_val[1]}\'"
                 
@@ -242,10 +248,10 @@ class Manager:
                 counter += 1
                 final_query_str += query_str
 
-                self.logger.info(f"final query currently is: \n{final_query_str}") # debug
-            operator = "=" # all other args are equality comparsions
+                self.logger.info(f"final query currently is: \n{final_query_str}")
+            operator = "="
 
-        self.logger.info(f"final query is \n{final_query_str + count_str}") # debug
+        self.logger.info(f"final query is \n{final_query_str + count_str}")
         return self.cur.execute(final_query_str + count_str)
     
 

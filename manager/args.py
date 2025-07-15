@@ -23,7 +23,7 @@ def validate(args) -> bool:
     if not args[left].startswith("--"):
         logger.error('no arg type provided')
     
-    curr_args = []
+    curr_args: list[str] = []
     curr_arg_type = args[left]
     for right in range(1, len(args)):
         if args[right].startswith("--"):
@@ -33,12 +33,33 @@ def validate(args) -> bool:
             if curr_arg_type == "--time" and len(curr_args) > 1:
                 logger.error('too many args passed with arg type \'--time\'')
                 return False
+            if args[right][2:] not in ARG_TYPES:
+                logger.error('one of the args is not an option')
+                return False
             curr_arg_type = args[right]
             left = right
             curr_args = []
         else:
             curr_args.append(args[right])
     return True
+
+
+def parser_helper(curr_arg_type, curr_args, parsed_args):
+    arg = " ".join(curr_args)
+    match curr_arg_type:
+        case "--time":
+            parsed_args[Valid_Args.TIME.value] = ("date_posted", count_days(arg))
+        case "--company":
+            parsed_args[Valid_Args.COMPANY.value] = ("company_name", arg)
+        case "--role":
+            parsed_args[Valid_Args.ROLE.value] = ("role", arg)
+        case "--location":
+            parsed_args[Valid_Args.LOCATION.value] = ("location", arg)
+        case "--level":
+            parsed_args[Valid_Args.LEVEL.value] = ("level", arg)
+        case "--count":
+            parsed_args[Valid_Args.COUNT.value] = ("count", arg)
+    return parsed_args
 
 """
 parses args in order of valid args enum in const.py
@@ -54,27 +75,21 @@ def parse(args):
     
     # sliding window to parse
     left = 0
+    if not args[left].startswith("--"):
+        logger.error('no arg type provided')
+    
     curr_arg_type = args[left]
     for right in range(1, len(args)):
         if args[right].startswith("--"):
-            arg = " ".join(curr_args)
-            match curr_arg_type:
-                case "--time":
-                    parsed_args[Valid_Args.TIME.value] = ("date_posted", count_days(arg))
-                case "--company":
-                    parsed_args[Valid_Args.COMPANY.value] = ("company_name", arg)
-                case "--role":
-                    parsed_args[Valid_Args.ROLE.value] = ("role", arg)
-                case "--location":
-                    parsed_args[Valid_Args.LOCATION.value] = ("location", arg)
-                case "--level":
-                    parsed_args[Valid_Args.LEVEL.value] = ("level", arg)
-                case "--count":
-                    parsed_args[Valid_Args.COUNT.value] = ("count", arg)
+            parsed_args = parser_helper(curr_arg_type, curr_args, parsed_args)
             left = right
             curr_arg_type = args[right]
+            curr_args = []
         else:
             curr_args.append(args[right])
+    
+    parsed_args = parser_helper(curr_arg_type, curr_args, parsed_args)
+
     logger.info(f'Parsed args: {parsed_args}')
     return tuple(parsed_args)
 

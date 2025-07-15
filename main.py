@@ -4,7 +4,6 @@ import logging
 from dotenv import load_dotenv
 import os
 from manager.manager import Manager
-from logging_config import setup_logging
 from config import Config
 from embed import embed
 
@@ -81,9 +80,13 @@ Returns:
 @bot.command()
 async def job(ctx, *args): # args is a tuple
     query_results = manager.get_data(args)
+    results = False
     for row in query_results:
+        results = True
         print(row) #debug print
         await ctx.send(embed=embed(row))
+    if not results:
+        await ctx.send("Query yielded 0 results.")
 
 
 bot.run(token, log_handler=handler, log_level=logging.DEBUG)
