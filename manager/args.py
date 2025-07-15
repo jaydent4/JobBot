@@ -30,8 +30,8 @@ def validate(args) -> bool:
             if len(curr_args) == 0:
                 logger.error(f'no args are provided with the arg type {curr_arg_type}')
                 return False
-            if curr_arg_type == "--time" and len(curr_args) > 1:
-                logger.error('too many args passed with arg type \'--time\'')
+            if (curr_arg_type == "--time" or curr_arg_type == "--source") and len(curr_args) > 1:
+                logger.error(f'too many args passed with arg type \'{curr_arg_type}\'')
                 return False
             if args[right][2:] not in ARG_TYPES:
                 logger.error('one of the args is not an option')
@@ -59,6 +59,8 @@ def parser_helper(curr_arg_type, curr_args, parsed_args):
             parsed_args[Valid_Args.LEVEL.value] = ("level", arg)
         case "--count":
             parsed_args[Valid_Args.COUNT.value] = ("count", arg)
+        case "--source":
+            parsed_args[Valid_Args.SOURCE.value] = ("scrape_source", arg)
     return parsed_args
 
 """

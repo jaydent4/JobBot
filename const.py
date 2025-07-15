@@ -6,17 +6,20 @@ ARG_TYPES = {
     "--role",
     "--location",
     "--level",
+    "--source",
     "--count"
 }
 
 class Valid_Args(Enum):
-    SIZE = 6
+    SIZE = 7
     TIME = 0
     COMPANY = 1
     ROLE = 2
     LOCATION = 3
     LEVEL = 4
-    COUNT = 5
+    SOURCE = 5
+    COUNT = 6
+    
 
 class Columns(Enum):
     ARGS_SIZE = 12
