@@ -1,16 +1,16 @@
 from .base import ScraperBase
 import requests
 from bs4 import BeautifulSoup
-from datetime import datetime
-from 
+from datetime import datetime 
 
 class ycombinatorScraper(ScraperBase):
     def __init__(self, url):
-        pass
+        self.url = url
     
 
     @classmethod
     def scrape(self) -> list[tuple] | None:
+        
         return None
 
     

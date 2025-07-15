@@ -139,7 +139,7 @@ class Manager:
             scraper_result = self.scrape(name)
             end_time = time.time()
             elapsed_time = end_time - start_time
-            if scraper_result == None:
+            if not scraper_result:
                 self.logger.error(f"SCARPER {name} DOES NOT EXIST")
             else:
                 self.performance_logger.info(f'Scraper {name} took {elapsed_time:.4f} seconds to run')
