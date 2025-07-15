@@ -21,6 +21,6 @@ def embed(query:tuple) -> discord.Embed:
     return embed
 
 def replace_none(value):
-    if value == "NONE": # replace this to what the actual empty field is
+    if value == "NONE":
         return "N/A"
     return value
