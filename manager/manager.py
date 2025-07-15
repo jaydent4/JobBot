@@ -19,7 +19,7 @@ class Manager:
         self.scrapers = {}
 
         self.load_scrapers()
-
+        
         try:
             with sqlite3.connect('./job.db') as self.conn:
                 self.cur = self.conn.cursor()

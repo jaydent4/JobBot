@@ -80,13 +80,15 @@ Returns:
 @bot.command()
 async def job(ctx, *args): # args is a tuple
     query_results = manager.get_data(args)
+    if not query_results:
+        await ctx.send("Jayden put ur funny embed for invalids here")
     results = False
     for row in query_results:
         results = True
         print(row) #debug print
         await ctx.send(embed=embed(row))
     if not results:
-        await ctx.send("Query yielded 0 results.")
+        await ctx.send("Query yielded 0 results. Jayden put ur funny embed for queries that result in 0 found here.")
 
 
 bot.run(token, log_handler=handler, log_level=logging.DEBUG)
