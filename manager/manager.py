@@ -106,7 +106,7 @@ class Manager:
                 self.logger.info(f'Attempting to load module: {module_name}')
                 module = importlib.import_module(module_name)
                 scraper = getattr(module, name + "Scraper")
-                self.scrapers[name] = scraper()
+                self.scrapers[name] = scraper(self.sources[name])
                 self.logger.info(f"loaded scraper: {module_name}")
             except Exception as e:
                 self.logger.error(f'Something occurred while attempting to load {module_name}: {e}')
@@ -118,11 +118,11 @@ class Manager:
     Returns:
         list[tuple]: each tuple is a separate job posting, each tuple must contain 10 elements in the order of the columns in the database; if the value canont be scraped, put None
     """
-    def scrape(self, name, link) -> list[tuple] | None:
+    def scrape(self, name) -> list[tuple] | None:
         if not self.scrapers[name]:
             self.logger.error(f'Scraper for {name} does not exist')
             return None
-        return self.scrapers[name].scrape(link)
+        return self.scrapers[name].scrape()
 
 
     """
@@ -136,7 +136,7 @@ class Manager:
         result: list[tuple] = []
         for name in self.scrapers.keys():
             start_time = time.time()
-            scraper_result = self.scrape(name, self.sources[name])
+            scraper_result = self.scrape(name)
             end_time = time.time()
             elapsed_time = end_time - start_time
             if scraper_result == None:

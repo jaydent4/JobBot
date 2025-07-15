@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 from datetime import datetime
 
 class githubScraper(ScraperBase):
-    def __init__(self):
+    def __init__(self, url):
         pass
 
     """
@@ -16,7 +16,8 @@ class githubScraper(ScraperBase):
         List of tuples
     """
     @classmethod
-    def scrape(cls, url) -> list[tuple]:
+    def scrape(cls) -> list[tuple]:
+        url = "https://github.com/SimplifyJobs/Summer2026-Internships"
         result = requests.get(url).text
         doc = BeautifulSoup(result, "lxml")
 

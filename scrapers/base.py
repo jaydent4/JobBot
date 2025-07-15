@@ -1,10 +1,10 @@
 from abc import ABC, abstractmethod
 
 class ScraperBase(ABC):
-    def __init__(self):
+    def __init__(self, url):
         pass
     
     @classmethod
     @abstractmethod
-    def scrape(cls, url):
+    def scrape(cls):
         pass
