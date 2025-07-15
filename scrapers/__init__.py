@@ -1,3 +1,3 @@
-from .github import GITHUBScraper
+from .github import githubScraper
 
-__all__ = ["GITHUBScraper"]
+__all__ = ["githubScraper"]

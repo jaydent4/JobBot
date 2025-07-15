@@ -1,9 +1,9 @@
-from base import ScraperBase
+from .base import ScraperBase
 import requests
 from bs4 import BeautifulSoup
 from datetime import datetime
 
-class GITHUBScraper(ScraperBase):
+class githubScraper(ScraperBase):
     def __init__(self):
         pass
 
@@ -84,4 +84,4 @@ class GITHUBScraper(ScraperBase):
 
 
 if __name__ == "__main__":
-    GITHUBScraper.scrape()
+    githubScraper.scrape()

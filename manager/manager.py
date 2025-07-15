@@ -101,12 +101,13 @@ class Manager:
     """
     def load_scrapers(self) -> None:
         for name in self.sources:
-            module_name = "scrapers." + name.lower()
+            module_name = "scrapers." + name
             try:
                 self.logger.info(f'Attempting to load module: {module_name}')
                 module = importlib.import_module(module_name)
-                scraper = getattr(module, name.upper() + "Scraper")
+                scraper = getattr(module, name + "Scraper")
                 self.scrapers[name] = scraper()
+                self.logger.info(f"loaded scraper: {module_name}")
             except Exception as e:
                 self.logger.error(f'Something occurred while attempting to load {module_name}: {e}')
     
@@ -132,16 +133,17 @@ class Manager:
         list[tuple]: containing job postings from all scrapers
     """
     def run_scrapers(self) -> list[tuple]:
-        result = []
+        result: list[tuple] = []
         for name in self.scrapers.keys():
             start_time = time.time()
             scraper_result = self.scrape(name)
             end_time = time.time()
             elapsed_time = end_time - start_time
-            if not scraper_result:
+            if scraper_result != None:
                 self.logger.error(f"SCARPER {name} DOES NOT EXIST")
             else:
                 self.performance_logger.info(f'Scraper {name} took {elapsed_time:.4f} seconds to run')
+                assert(scraper_result != None) # or else red siggly
                 result.extend(scraper_result)
         return result
 
