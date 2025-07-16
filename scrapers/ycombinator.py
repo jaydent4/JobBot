@@ -10,7 +10,7 @@ class ycombinatorScraper(ScraperBase):
     def scrape(self) -> list[tuple] | None:
         page = requests.get(self.url).content
         doc = BeautifulSoup(page, "lxml")
-        print(doc.prettify)
+        print(doc.prettify())
         return None
     
 
