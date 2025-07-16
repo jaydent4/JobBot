@@ -41,11 +41,12 @@ Return:
 """
 @tasks.loop(hours=UPDATE_RATE)
 async def update():
+    channel = bot.get_channel(JOB_POSTING_CHANNEL)
     await channel.send("Automatic dB Update began")
     updateInfo = manager.update()
     if updateInfo[0]:
         new_postings = updateInfo[1]
-        channel = bot.get_channel(JOB_POSTING_CHANNEL)
+        # channel = bot.get_channel(JOB_POSTING_CHANNEL)
         await channel.send(f"{new_postings}")
     else:
         await channel.send("No need Jobs posted. stay unemployed gang")

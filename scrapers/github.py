@@ -15,8 +15,7 @@ class githubScraper(ScraperBase):
     Returns:
         List of tuples
     """
-    @classmethod
-    def scrape(cls) -> list[tuple]:
+    def scrape(self, url) -> list[tuple]:
         url = "https://github.com/SimplifyJobs/Summer2026-Internships"
         result = requests.get(url).text
         doc = BeautifulSoup(result, "lxml")
@@ -39,23 +38,23 @@ class githubScraper(ScraperBase):
                 current_job_data = [col.get_text(strip=True) for i, col in enumerate(cols) if i != 3]
 
                 # checks if post date is within 0-2 days
-                if cls.filter_date(current_job_data):
+                if self.filter_date(current_job_data):
                     if current_job_data[0] != "↳":
                         prev_company = current_job_data[0]
                     else:
                         current_job_data[0] = prev_company
 
-
+                    job_id = None
                     company = current_job_data[0]
                     role = current_job_data[1]
                     location = current_job_data[2]
                     link = "NONE"
                     date_posted = "NONE"
                     time_posted = "NONE"
-                    level = "NONE"
+                    level = "intern"
 
                     job_info = (
-                        "NONE",
+                        job_id,
                         company,
                         role,
                         location,
@@ -75,8 +74,8 @@ class githubScraper(ScraperBase):
         # print(job_data)
         return job_data
 
-    @staticmethod
-    def filter_date(job_data) -> bool:
+
+    def filter_date(self, job_data) -> bool:
         date_ranges = ["0d", "1d", "2d"]
         if job_data[3] not in date_ranges:
             return False

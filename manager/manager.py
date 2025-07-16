@@ -100,6 +100,7 @@ class Manager:
     Attempt to load all scrapers from configurations
     """
     def load_scrapers(self) -> None:
+        
         for name in self.sources:
             module_name = "scrapers." + name
             try:
@@ -119,10 +120,10 @@ class Manager:
         list[tuple]: each tuple is a separate job posting, each tuple must contain 10 elements in the order of the columns in the database; if the value canont be scraped, put None
     """
     def scrape(self, name) -> list[tuple] | None:
-        if not self.scrapers[name]:
+        if name not in self.scrapers:
             self.logger.error(f'Scraper for {name} does not exist')
             return None
-        return self.scrapers[name].scrape()
+        return self.scrapers[name].scrape("None")
 
 
     """
