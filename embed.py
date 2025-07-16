@@ -11,7 +11,9 @@ def embed(query:tuple) -> discord.Embed:
     date_scraped = replace_none(query[Columns.DATE_SCRAPED.value])
     level = replace_none(query[Columns.LEVEL.value])
 
-    embed = discord.Embed(title=f'**{company_name}**: {role} ({id})', url=link, color=discord.Color.blue())
+    title = f'**{company_name}**: {role} ({id})'
+    link = link if link.startswith("http") else None
+    embed = discord.Embed(title=title, url=link, color=discord.Color.blue())
     embed.add_field(name="Location", value=location, inline=True)
     embed.add_field(name="Level", value=level, inline=True)
     embed.add_field(name="Date Posted", value=date_posted, inline=False)

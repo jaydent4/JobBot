@@ -30,7 +30,7 @@ def validate(args) -> bool:
             if len(curr_args) == 0:
                 logger.error(f'no args are provided with the arg type {curr_arg_type}')
                 return False
-            if (curr_arg_type == "--time" or curr_arg_type == "--source") and len(curr_args) > 1:
+            if (curr_arg_type == "--time" or curr_arg_type == "--count") and len(curr_args) > 1:
                 logger.error(f'too many args passed with arg type \'{curr_arg_type}\'')
                 return False
             if args[right] not in ARG_TYPES:
