@@ -49,13 +49,13 @@ class githubScraper(ScraperBase):
                     company = current_job_data[0]
                     role = current_job_data[1]
                     location = current_job_data[2]
-                    link = None
-                    date_posted = None
-                    time_posted = None
-                    level = None
+                    link = "NONE"
+                    date_posted = "NONE"
+                    time_posted = "NONE"
+                    level = "NONE"
 
                     job_info = (
-                        None,
+                        "NONE",
                         company,
                         role,
                         location,
@@ -83,5 +83,5 @@ class githubScraper(ScraperBase):
         return True
 
 
-if __name__ == "__main__":
-    githubScraper.scrape()
+# if __name__ == "__main__":
+    # githubScraper.scrape()
