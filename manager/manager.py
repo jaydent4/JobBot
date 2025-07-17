@@ -48,11 +48,11 @@ class Manager:
             print("Failed to create table because:", e)
 
         # TRYING TO LOAD FAKE DATA AND INSERT INTO DB, IT WORKS BTW
-        data = pd.read_csv("./manager/fake_data.csv")
-        print(data)
-        data = data.values.tolist()
-        self.cur.executemany("INSERT INTO jobPostings VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data)
-        self.conn.commit()
+        # data = pd.read_csv("./manager/fake_data.csv")
+        # print(data)
+        # data = data.values.tolist()
+        # self.cur.executemany("INSERT INTO jobPostings VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data)
+        # self.conn.commit()
 
         # prints out what is currently in the db
         for row in self.cur.execute("SELECT * FROM jobPostings ORDER BY id"):
@@ -122,7 +122,7 @@ class Manager:
         if name not in self.scrapers:
             self.logger.error(f'Scraper for {name} does not exist')
             return None
-        return self.scrapers[name].scrape(str(self.sources[name]))
+        return self.scrapers[name].scrape()
 
 
     """
