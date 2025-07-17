@@ -19,7 +19,8 @@ def embed(query:tuple) -> discord.Embed:
     embed.add_field(name="Date Posted", value=date_posted, inline=False)
     embed.add_field(name="Date Scraped", value=date_scraped, inline=True)
 
-    embed.set_footer(text="For issues and suggestions, visit: https://github.com/jaydent4/JobBot/issues")
+    issues_url = "https://github.com/jaydent4/JobBot/issues"
+    embed.set_footer(text=f'For issues and suggestions, visit: {issues_url}')
     return embed
 
 def replace_none(value):
