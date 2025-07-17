@@ -13,7 +13,8 @@ JOB_POSTING_CHANNEL = config.channel
 UPDATE_RATE = config.rate
 
 load_dotenv()
-token = os.getenv('DISCORD_TOKEN')
+token = os.getenv("DISCORD_TOKEN")
+print(token)
 
 handler = logging.FileHandler(filename="discord_log", encoding='utf-8', mode='w')
 intents = discord.Intents.default()
@@ -94,4 +95,4 @@ async def job(ctx, *args): # args is a tuple
         await ctx.send("Query yielded 0 results. Jayden put ur funny embed for queries that result in 0 found here.")
 
 
-bot.run(token, log_handler=handler, log_level=logging.DEBUG)
+bot.run(str(token), log_handler=handler, log_level=logging.DEBUG)

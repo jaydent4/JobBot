@@ -89,7 +89,7 @@ class Manager:
         # for row in q:
         #     print(row)
 
-        # job = [("8","nvidia","EE","LA","https://www.amazon.com/","NONE","NONE","15 Jun 2000","10:30","github","intern")]
+        # job = [("5","meta","swe","canada","https://www.amazon.com/","2025-05-07","09:10","2025-05-11","05:30","fake","intern")]
         # self.update_DB(job)
         # print("------")
         # for row in self.cur.execute("SELECT * FROM jobPostings ORDER BY id"):
