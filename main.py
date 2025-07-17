@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 import os
 from manager.manager import Manager
 from config import Config
-from embed import embed
+from embed import embed, bad_embed
 
 config = Config()
 
@@ -85,14 +85,14 @@ Returns:
 async def job(ctx, *args): # args is a tuple
     query_results = manager.get_data(args)
     if not query_results:
-        await ctx.send("Jayden put ur funny embed for invalids here")
+        await ctx.send(embed=bad_embed("invalid args"))
     results = False
     for row in query_results:
         results = True
         print(row) #debug print
         await ctx.send(embed=embed(row))
     if not results:
-        await ctx.send("Query yielded 0 results. Jayden put ur funny embed for queries that result in 0 found here.")
+        await ctx.send(embed=bad_embed("no query results"))
 
 
 bot.run(str(token), log_handler=handler, log_level=logging.DEBUG)
