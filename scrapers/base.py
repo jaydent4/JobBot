@@ -6,5 +6,5 @@ class ScraperBase(ABC):
     
     @classmethod
     @abstractmethod
-    def scrape(cls):
+    def scrape(self, url) -> list[tuple]:
         pass

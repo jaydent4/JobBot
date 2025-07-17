@@ -27,11 +27,11 @@ class Manager:
                 # creates a dB if there isn't one yet; opens existing dB if there is
                 self.cur.execute(
                     """ CREATE TABLE IF NOT EXISTS jobPostings (
-                        id INTEGER PRIMARY KEY, 
+                        application_link TEXT PRIMARY KEY,
+                        id INTEGER, 
                         company_name TEXT NOT NULL, 
                         role TEXT NOT NULL, 
                         location TEXT NOT NULL, 
-                        application_link TEXT, 
                         date_posted DATE NOT NULL,
                         time_posted TIME, 
                         date_scraped DATE NOT NULL,
@@ -48,12 +48,11 @@ class Manager:
             print("Failed to create table because:", e)
 
         # TRYING TO LOAD FAKE DATA AND INSERT INTO DB, IT WORKS BTW
-        # data = pd.read_csv("./manager/fake_data.csv")
-        # print(data)
-        # data = data.values.tolist()
-        # self.cur.executemany("INSERT INTO jobPostings VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data)
-        # self.conn.commit()
-        # print('hi') # when its in db it won't insert it again (hi does not get printed)
+        data = pd.read_csv("./manager/fake_data.csv")
+        print(data)
+        data = data.values.tolist()
+        self.cur.executemany("INSERT INTO jobPostings VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data)
+        self.conn.commit()
 
         # prints out what is currently in the db
         for row in self.cur.execute("SELECT * FROM jobPostings ORDER BY id"):
@@ -68,12 +67,12 @@ class Manager:
         # #                                AND date_posted > '2025-06-01'
         # #                                AND time_posted >= '01:04' (side note can also do: time_posted > '01:04:00.000')
         # #                                """)
-        queryControl = self.cur.execute("""SELECT * FROM jobPostings 
-                                       WHERE company_name = 'google'
-                                       LIMIT 1
-                                       """)
-        for row in queryControl:
-            print(row)
+        # queryControl = self.cur.execute("""SELECT * FROM jobPostings 
+        #                                WHERE company_name = 'google'
+        #                                LIMIT 1
+        #                                """)
+        # for row in queryControl:
+        #     print(row)
 
         # print("---")
         # s1 = """SELECT * FROM jobPostings
@@ -84,10 +83,10 @@ class Manager:
         #                     """
         # L = "LIMIT 2"
         # intersection = s1 + "INTERSECT " + s2 + " " + L
-        # q = self.cur.execute(intersection)
+        q = self.cur.execute(f"SELECT * FROM jobPostings ORDER BY date_scraped DESC LIMIT 2")
 
-        # for row in q:
-        #     print(row)
+        for row in q:
+            print(row)
 
         # job = [("5","meta","swe","canada","https://www.amazon.com/","2025-05-07","09:10","2025-05-11","05:30","fake","intern")]
         # self.update_DB(job)
@@ -123,7 +122,7 @@ class Manager:
         if name not in self.scrapers:
             self.logger.error(f'Scraper for {name} does not exist')
             return None
-        return self.scrapers[name].scrape("None")
+        return self.scrapers[name].scrape(str(self.sources[name]))
 
 
     """
@@ -231,6 +230,8 @@ class Manager:
         count = 1 # default return 1 jobposting from database
         if parsed_args[Valid_Args.COUNT.value] is not None:
             count = parsed_args[Valid_Args.COUNT.value][1]
+            if len(alphanum_args) == 2 and alphanum_args[0] == "--count":
+                return self.cur.execute(f"SELECT * FROM jobPostings ORDER BY date_scraped DESC LIMIT {count}")
 
         base_str = "SELECT * FROM jobPostings WHERE "
         counter = 0

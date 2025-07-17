@@ -54,12 +54,12 @@ class githubScraper(ScraperBase):
                     level = "intern"
 
                     job_info = (
-                        job_id,
+                        date_posted,
                         company,
                         role,
                         location,
                         link,
-                        date_posted,
+                        job_id,
                         time_posted,
                         date_scraped,
                         time_scraped,
