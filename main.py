@@ -49,7 +49,7 @@ async def update():
         new_postings = updateInfo[1]
         await channel.send(embed=embed(new_postings))
     else:
-        await channel.send("No need Jobs posted. stay unemployed gang")
+        await channel.send("No new j*bs posted. Stay unemployed gang L bozo")
 
 
 """

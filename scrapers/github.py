@@ -1,4 +1,4 @@
-from base import ScraperBase
+from .base import ScraperBase
 import requests
 from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
@@ -78,9 +78,9 @@ class githubScraper(ScraperBase):
         # for i in job_data:
         #     print(i)
         # print(job_data)
-        # return job_data
+        return job_data
 
 
-if __name__ == "__main__":
-    scraper = githubScraper("https://github.com/SimplifyJobs/Summer2026-Internships")
-    scraper.scrape()
+# if __name__ == "__main__":
+#     scraper = githubScraper("https://github.com/SimplifyJobs/Summer2026-Internships")
+#     scraper.scrape()
