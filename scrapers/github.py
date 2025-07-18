@@ -34,8 +34,9 @@ class githubScraper(ScraperBase):
             prev_company = None
             for row in rows:
                 cols = row.find_all("td")
+
                 # checks if post date is within 0-2 days
-                if cols[4].get_text(strip=True) not in ["0d", "1d", "2d"]:
+                if cols[4].get_text(strip=True) not in ["0d", "1d", "2d", "3d"]:
                     continue
 
                 current_job_data = [col.get_text(strip=True).encode("ascii", "ignore").decode("ascii") for i, col in enumerate(cols) if i != 3]
@@ -48,15 +49,13 @@ class githubScraper(ScraperBase):
                 # print(current_job_data)
 
                 posted_date = datetime.now() - timedelta(days=int(current_job_data[3][0]))
-                # print(int(current_job_data[3][0]))
-                # print(posted_date)
-
+                link_data = cols[3].find("a")
 
                 job_id = None
                 company = current_job_data[0]
                 role = current_job_data[1]
                 location = current_job_data[2]
-                link = "NONE"
+                link = link_data.get("href") if link_data else None
                 date_posted = posted_date.strftime("%Y %b %d")
                 time_posted = posted_date.strftime("%H:%M")
                 level = "intern"
@@ -76,8 +75,8 @@ class githubScraper(ScraperBase):
                 )
                 job_data.append(job_info)
 
-        for i in job_data:
-            print(i)
+        # for i in job_data:
+        #     print(i)
         # print(job_data)
         # return job_data
 
