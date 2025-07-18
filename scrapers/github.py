@@ -55,7 +55,7 @@ class githubScraper(ScraperBase):
                 company = current_job_data[0]
                 role = current_job_data[1]
                 location = current_job_data[2]
-                link = link_data.get("href") if link_data else None
+                link = link_data.get("href") if link_data else "None"
                 date_posted = posted_date.strftime("%Y %b %d")
                 time_posted = posted_date.strftime("%H:%M")
                 level = "intern"
