@@ -81,6 +81,6 @@ class githubScraper(ScraperBase):
         return job_data
 
 
-if __name__ == "__main__":
-    scraper = githubScraper("https://github.com/SimplifyJobs/Summer2026-Internships")
-    scraper.scrape()
+# if __name__ == "__main__":
+#     scraper = githubScraper("https://github.com/SimplifyJobs/Summer2026-Internships")
+#     scraper.scrape()
