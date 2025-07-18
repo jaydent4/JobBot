@@ -47,7 +47,7 @@ async def update():
     updateInfo = manager.update()
     if updateInfo[0]:
         new_postings = updateInfo[1]
-        await channel.send(f"{new_postings}")
+        await channel.send(embed=embed(new_postings))
     else:
         await channel.send("No need Jobs posted. stay unemployed gang")
 

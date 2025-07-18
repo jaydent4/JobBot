@@ -32,6 +32,6 @@ class Columns(Enum):
     TIME_POSTED = 6
     DATE_SCRAPED = 7
     TIME_SCRAPED = 8
-    SCRAPED_SOURCES = 9
+    SCRAPED_SOURCE = 9
     LEVEL = 10
     COUNT = 11
