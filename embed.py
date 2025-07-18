@@ -18,13 +18,15 @@ def embed(query:tuple) -> discord.Embed:
     date_scraped = replace_none(query[Columns.DATE_SCRAPED.value])
     level = replace_none(query[Columns.LEVEL.value])
 
-    title = f'**{company_name}**: {role} ({id})'
+    title = f'**{company_name}** - {role}'
     link = link if link.startswith("http") else None
-    embed = discord.Embed(title=title, url=link, color=discord.Color.blue())
+    embed = discord.Embed(title=title, url=link, color=discord.Color.from_str("#7785cc"))
     embed.add_field(name="Location", value=location, inline=True)
     embed.add_field(name="Level", value=level, inline=True)
-    embed.add_field(name="Date Posted", value=date_posted, inline=False)
+    embed.add_field(name="\u200b", value="\u200b", inline=True)
+    embed.add_field(name="Date Posted", value=date_posted, inline=True)
     embed.add_field(name="Date Scraped", value=date_scraped, inline=True)
+    embed.add_field(name="\u200b", value="\u200b", inline=True)
 
     issues_url = "https://github.com/jaydent4/JobBot/issues"
     embed.set_footer(text=f'For issues and suggestions, visit: {issues_url}')

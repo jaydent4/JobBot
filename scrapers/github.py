@@ -1,4 +1,4 @@
-from base import ScraperBase
+from .base import ScraperBase
 import requests
 from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
@@ -46,7 +46,7 @@ class githubScraper(ScraperBase):
                     prev_company = current_job_data[0]
                 else:
                     current_job_data[0] = prev_company
-                print(current_job_data)
+                # print(current_job_data)
 
                 posted_date = datetime.now() - timedelta(days=int(current_job_data[3][0]))
                 link_data = cols[3].find("a")
@@ -58,7 +58,7 @@ class githubScraper(ScraperBase):
                 link = link_data.get("href") if link_data else "None"
                 date_posted = posted_date.strftime("%Y %b %d")
                 time_posted = posted_date.strftime("%H:%M")
-                level = "intern"
+                level = "Intern"
 
                 job_info = (
                     link,
