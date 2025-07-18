@@ -1,4 +1,4 @@
-from .base import ScraperBase
+from base import ScraperBase
 import requests
 from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
@@ -42,11 +42,11 @@ class githubScraper(ScraperBase):
                 current_job_data = [col.get_text(strip=True).encode("ascii", "ignore").decode("ascii") for i, col in enumerate(cols) if i != 3]
 
                 # replaces filler subcategories
-                if current_job_data[0] != "↳":
+                if current_job_data[0]:
                     prev_company = current_job_data[0]
                 else:
                     current_job_data[0] = prev_company
-                # print(current_job_data)
+                print(current_job_data)
 
                 posted_date = datetime.now() - timedelta(days=int(current_job_data[3][0]))
                 link_data = cols[3].find("a")
@@ -61,12 +61,12 @@ class githubScraper(ScraperBase):
                 level = "intern"
 
                 job_info = (
-                    date_posted,
+                    link,
+                    job_id,
                     company,
                     role,
                     location,
-                    link,
-                    job_id,
+                    date_posted,
                     time_posted,
                     date_scraped,
                     time_scraped,
@@ -81,6 +81,6 @@ class githubScraper(ScraperBase):
         return job_data
 
 
-# if __name__ == "__main__":
-#     scraper = githubScraper("https://github.com/SimplifyJobs/Summer2026-Internships")
-#     scraper.scrape()
+if __name__ == "__main__":
+    scraper = githubScraper("https://github.com/SimplifyJobs/Summer2026-Internships")
+    scraper.scrape()
