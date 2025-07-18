@@ -1,7 +1,8 @@
 from base import ScraperBase
 import requests
 from bs4 import BeautifulSoup
-from datetime import datetime
+from datetime import datetime, timedelta
+# from const import Columns
 
 class githubScraper(ScraperBase):
     def __init__(self, url):
@@ -44,14 +45,20 @@ class githubScraper(ScraperBase):
                     prev_company = current_job_data[0]
                 else:
                     current_job_data[0] = prev_company
+                # print(current_job_data)
+
+                posted_date = datetime.now() - timedelta(days=int(current_job_data[3][0]))
+                # print(int(current_job_data[3][0]))
+                # print(posted_date)
+
 
                 job_id = None
                 company = current_job_data[0]
                 role = current_job_data[1]
                 location = current_job_data[2]
                 link = "NONE"
-                date_posted = "NONE"
-                time_posted = "NONE"
+                date_posted = posted_date.strftime("%Y %b %d")
+                time_posted = posted_date.strftime("%H:%M")
                 level = "intern"
 
                 job_info = (
@@ -69,7 +76,8 @@ class githubScraper(ScraperBase):
                 )
                 job_data.append(job_info)
 
-        # for i in job_data:
+        for i in job_data:
+            print(i)
         # print(job_data)
         # return job_data
 
