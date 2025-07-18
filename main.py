@@ -83,6 +83,14 @@ Returns:
 """
 @bot.command()
 async def job(ctx, *args): # args is a tuple
+    if "--help" in args:
+        if len(args) == 1:
+            await ctx.send("[jayden insert something helpful here]")
+            return None
+        else:
+            await ctx.send(embed=bad_embed("y u putting other args with help"))
+            return None
+    
     query_results = manager.get_data(args)
     if not query_results:
         await ctx.send(embed=bad_embed("invalid args"))
