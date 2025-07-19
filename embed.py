@@ -29,7 +29,11 @@ def embed(query:tuple) -> discord.Embed:
     embed.add_field(name="\u200b", value="\u200b", inline=True)
 
     issues_url = "https://github.com/jaydent4/JobBot/issues"
-    embed.set_footer(text=f'For issues and suggestions, visit: {issues_url}')
+    embed.add_field(
+        name="Suggestions and Issues",
+        value=f"For any suggestions and issues, see our [issues page]({issues_url})",
+        inline=False
+    )
     return embed
 
 def replace_none(value):
