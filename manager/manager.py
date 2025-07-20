@@ -4,7 +4,8 @@ from logging_config import setup_logging
 from .args import validate, parse
 import pandas as pd
 import time
-from const import Valid_Args
+from const import Valid_Args, Columns
+import datetime
 
 
 class Manager:
@@ -28,7 +29,7 @@ class Manager:
                 self.cur.execute(
                     """ CREATE TABLE IF NOT EXISTS jobPostings (
                         application_link TEXT PRIMARY KEY,
-                        id INTEGER, 
+                        id INTEGER,
                         company_name TEXT NOT NULL, 
                         role TEXT NOT NULL, 
                         location TEXT NOT NULL, 
@@ -176,12 +177,15 @@ class Manager:
     """
     def update_DB(self, job_postings: list[tuple]) -> None:
         for job in job_postings:
-            try:
-                self.cur.execute("INSERT INTO jobPostings VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", job)
-                self.logger.info(f"succesfully inserted scrapped job: {job} into the database")
-                self.conn.commit()
-            except Exception as e:
-                self.logger.error(f"Something errored while inserting scrapped job {job} into the main database: {e}")
+            if datetime.date.fromisoformat(job[Columns.DATE_POSTED.value]):
+                try:
+                    self.cur.execute("INSERT INTO jobPostings VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", job)
+                    self.logger.info(f"succesfully inserted scrapped job: {job} into the database")
+                    self.conn.commit()
+                except Exception as e:
+                    self.logger.error(f"Something errored while inserting scrapped job {job} into the main database: {e}")
+            else:
+                self.logger.error(f"scrapped job: {job} does not have the correct date_posted format of: YYYY-MM-DD")
 
     
     """
@@ -256,6 +260,6 @@ class Manager:
             operator = "="
 
         self.logger.info(f"final query is \n{final_query_str + count_str}")
-        return self.cur.execute(final_query_str + count_str)
+        return self.cur.execute(final_query_str + count_str + " " + "COLLATE NOCASE")
     
 

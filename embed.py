@@ -1,5 +1,6 @@
 import discord 
 from const import Columns
+from datetime import datetime
 
 def bad_embed(msg) -> discord.Embed:
     description = f"{msg}... just put the fries in the bag..."
@@ -14,7 +15,7 @@ def embed(query:tuple) -> discord.Embed:
     role = replace_none(query[Columns.ROLE.value])
     location = replace_none(query[Columns.LOCATION.value])
     link = replace_none(query[Columns.APPLICATION_LINK.value])
-    date_posted = replace_none(query[Columns.DATE_POSTED.value])
+    date_posted = date_prettify(query[Columns.DATE_POSTED.value])
     date_scraped = replace_none(query[Columns.DATE_SCRAPED.value])
     level = replace_none(query[Columns.LEVEL.value])
 
@@ -40,3 +41,8 @@ def replace_none(value):
     if value == "NONE":
         return "N/A"
     return value
+
+def date_prettify(s):
+    if s != "NONE":
+        return datetime.strptime(s, "%Y-%m-%d").strftime("%d %B %Y")
+    return "NONE"
