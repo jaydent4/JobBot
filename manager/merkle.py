@@ -1,32 +1,43 @@
 import hashlib
 
+"""
+Computes SHA256 hash
+Args:
+    data: list
+Returns:
+    str, computed hash
+"""
 def hash(data):
-    return hashlib.sha256(data).hexdigest()
+    return hashlib.sha256(data.encode('utf-8')).hexdigest()
 
-def compare(root1, root2):
-    if not root1 and not root2:
-        return True
-    if not root1 or not root2:
-        return False
-    if hashlib.compare_digest(bytes.fromhex(root1.hash), bytes.fromhex(root2.hash)):
-        return True
-    left = compare(root1.left, root2.left)
-    right = compare(root1.right, root2.right)
-    return left or right
+"""
+Computes checksum
+Args:
+    prev_hash: list, previously computed hash from previous scrape
+Returns:
+    bool
+"""
+def checksum(prev_hash, data):
+    new_merkle = compute_merkle(data)
+    return hashlib.compare_digest(bytes.fromhex(prev_hash), bytes.fromhex(new_merkle))
 
-class MerkleTreeNode:
-    def __init__(self, data):
-        self.hash = hash
-        self.left = None
-        self.right = None
-
-class MerkleTree:
-    def __init__(self, data):
-        self.root = self.construct_tree(data)
-
-    def construct_tree(self, data) -> MerkleTreeNode:
-        if len(data) % 2 != 0:
-            data.append(data[-1])
-        
+"""
+Computes merkle root
+Args:
+    data: list
+Returns:
+    str, computed merkle root
+"""
+def compute_merkle(data):
+    if not data:
         return None
+    if len(data) == 1:
+        return hash(data[0])
+    next_level = []
+    for i in range(0, len(data), 2):
+        combined_hash = hash(data[i] + data[i + 1])
+        next_level.append(combined_hash)
+    return compute_merkle(next_level)
+
+    
         
