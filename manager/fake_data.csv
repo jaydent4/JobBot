@@ -1,8 +1,9 @@
 job_counter,grp_id,application_link,id,company_name,role,location,date_posted,time_posted,date_scraped,time_scraped,scrape_source,level
 0,0,https://www.google.com/search?q=matplotlib%20linestyles,1,amazon,swe,menlo park,2025-06-01,11:20,2025-06-02,11:20,fake,intern
 1,0,https://www.google.com/search?q=matplotlib%20linestyles,1,amazon,swe,nyc,2025-06-01,11:20,2025-06-02,11:20,fake,intern
-2,1,https://matplotlib.org/stable/gallery/subplots_axes_and_figures/subplots_demo.html,2,google,swe,nyc,2025-06-05,11:20,2025-06-07,9:20,fake,intern
-3,2,https://stackoverflow.com/questions/41841988/sql-select-to-get-the-most-recently-added-entries,3,amazon,test writer,la,2024-04-13,04:30,2015-04-15,01:03,fake,intern
-4,3,https://www.geeksforgeeks.org/python/implementing-web-scraping-python-beautiful-soup/,4,amazon,ML,ca,2025-06-05,11:20,2025-06-09,02:30,fake,intern
-5,4,https://www.crummy.com/software/BeautifulSoup/bs3/documentation.html,5,meta,swe,canada,2025-05-07,09:10,2025-05-11,05:30,fake,intern
-6,5,https://selenium-python.readthedocs.io/installation.html#introduction,6,nvidia,EE,LA,2025-06-21,12:10,2000-06-15,10:30,fake,intern
+2,1,https://www.google.com/search?q=matplotlib%20linestyles,1,amazon,swe,nyc,2025-06-01,11:20,2025-06-02,11:20,fake,intern
+3,2,https://matplotlib.org/stable/gallery/subplots_axes_and_figures/subplots_demo.html,2,google,swe,nyc,2025-06-05,11:20,2025-06-07,9:20,fake,intern
+4,3,https://stackoverflow.com/questions/41841988/sql-select-to-get-the-most-recently-added-entries,3,amazon,test writer,la,2024-04-13,04:30,2015-04-15,01:03,fake,intern
+5,4,https://www.geeksforgeeks.org/python/implementing-web-scraping-python-beautiful-soup/,4,amazon,ML,ca,2025-06-05,11:20,2025-06-09,02:30,fake,intern
+6,5,https://www.crummy.com/software/BeautifulSoup/bs3/documentation.html,5,meta,swe,canada,2025-05-07,09:10,2025-05-11,05:30,fake,intern
+7,6,https://selenium-python.readthedocs.io/installation.html#introduction,6,nvidia,EE,LA,2025-06-21,12:10,2000-06-15,10:30,fake,intern

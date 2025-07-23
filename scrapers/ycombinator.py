@@ -27,7 +27,7 @@ class ycombinatorScraper(ScraperBase):
         default = "NONE"
         self.url = url
     
-    def scrape(self) -> list[tuple] | None:
+    def scrape(self, job_counter, grp_counter) -> list[tuple] | None:
         self.datetime = datetime.now()
         self.date_scraped = self.datetime.date()
         self.time_scraped = self.datetime.time()

@@ -13,7 +13,7 @@ Args:
 Returns:
     bool
 """
-def validate(args) -> bool:
+def validate_args(args) -> bool:
     if not args:
         logger.error('no args were provided')
         return False

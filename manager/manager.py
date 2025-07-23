@@ -1,7 +1,7 @@
 import sqlite3
 import importlib
 from logging_config import setup_logging
-from .args import validate, parse
+from .args import validate_args, parse
 import pandas as pd
 import time
 from const import Valid_Args, Columns
@@ -9,11 +9,13 @@ import datetime
 
 
 class Manager:
-    def __init__(self, sources):
+    def __init__(self, sources, job_counter, grp_id):
         self.logger = setup_logging("Manager", "INFO", "INFO", "manager.log")
         self.performance_logger = setup_logging("Manager-performance", "INFO", "INFO", "performance.log")
 
         self.sources = sources
+        self.job_counter = job_counter
+        self.grp_id = grp_id
         
         self.scrapers = {}
         self.load_scrapers()
@@ -49,7 +51,7 @@ class Manager:
         # TRYING TO LOAD FAKE DATA AND INSERT INTO DB
         data = pd.read_csv("./manager/fake_data.csv")
         data = data.values.tolist()
-        self.update_DB(data) 
+        self.update_DB(data)
 
         for row in self.cur.execute("SELECT * FROM jobPostings ORDER BY job_counter"):
             print(row)
@@ -117,7 +119,7 @@ class Manager:
         if name not in self.scrapers:
             self.logger.error(f'Scraper for {name} does not exist')
             return None
-        return self.scrapers[name].scrape()
+        return self.scrapers[name].scrape(self.job_counter, self.grp_id)
 
 
     """
@@ -159,21 +161,27 @@ class Manager:
         else:
             return (False, None)
         
-    # def validate_null(self, job_posting: tuple) -> bool:
-    #     if len(job_posting) == Columns.ARGS_SIZE:
-    #         self.logger.error(f"Incorrect number of values for job: {job_posting}")
-    #         return False
-    #     elif type(job_posting["job_counter"]) != int:
-    #         self.logger.error(f"invalid primary key")
-    #     return True
         
     def validate_repeat(self, job_posting: tuple) -> bool:
-        link = job_posting[Columns.APPLICATION_LINK]
-        if link != "NONE" or link != None:
+        link = job_posting[Columns.APPLICATION_LINK.value]
+
+        if link != "NONE" or link != None or link == "":
             self.logger.error(f"must have application link for job: {job_posting}")
-        # check if same linke exists
-        results = 
+
+        query_str = f"SELECT * FROM jobPostings WHERE application_link = \'{link}\'"
+        results = self.cur.execute(query_str)
+
+        grp_ids = set([r[Columns.GRP_ID.value] for r in results])
+
+        if len(results) == 0:
+            return True
+        elif len(grp_ids) == 1 and job_posting[Columns.GRP_ID.value] in grp_ids:
+            return True
+        else:
+            self.logger.error(f"this job {job_posting}'s application link already exists in the database")
+            return False
         
+
     def validate_date(self, job_posting:tuple) -> bool:
         assert len(job_posting) == Columns.ARGS_SIZE, "Incorrect number of values"
         if datetime.date.fromisoformat(job_posting[Columns.DATE_POSTED.value]):
@@ -193,7 +201,7 @@ class Manager:
     """
     def update_DB(self, job_postings: list[tuple]) -> None:
         for job in job_postings:
-            if self.validate_date(job):
+            if self.validate_repeat(job) and self.validate_date(job):
                 try:
                     self.cur.execute("INSERT INTO jobPostings VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", job)
                     self.logger.info(f"succesfully inserted scrapped job: {job} into the database")
@@ -201,7 +209,23 @@ class Manager:
                 except Exception as e:
                     self.logger.error(f"Something errored while inserting scrapped job {job} into the main database: {e}")
 
-    
+
+    def obtain_dB_results(self, query_string: str, count: int) -> list[tuple]:
+        out: list[tuple] = []
+        while len(out) < count:
+            q_result = self.cur.execute(query_string)
+            job_posting = list(q_result[0])
+            job_posting[Columns.LOCATION.value] = [job_posting[Columns.LOCATION.value]]
+            for r in q_result[1:]:
+                if job_posting[Columns.GRP_ID.value] == r[Columns.GRP_ID.value]:
+                    job_posting[Columns.LOCATION.value].append(r[Columns.LOCATION.value])
+                else:
+                    out.append(tuple(job_posting))
+                    job_posting = list(r)                    
+        
+        return out
+        
+
     """
     Returns data from the database with respect to flags
 
@@ -236,7 +260,7 @@ class Manager:
         
         self.logger.info(alphanum_args)
 
-        if not validate(tuple(alphanum_args)):
+        if not validate_args(tuple(alphanum_args)):
             return None
         
         self.logger.info(f"validation stage passed")
@@ -249,13 +273,13 @@ class Manager:
         if parsed_args[Valid_Args.COUNT.value] is not None:
             count = parsed_args[Valid_Args.COUNT.value][1]
             if len(alphanum_args) == 2 and alphanum_args[0] == "--count":
-                return self.cur.execute(f"SELECT * FROM jobPostings ORDER BY date_scraped DESC LIMIT {count}")
+                query_str = f"SELECT * FROM jobPostings ORDER BY date_scraped DESC LIMIT {count}"
+                return self.obtain_dB_results(query_str, count)
 
         base_str = "SELECT * FROM jobPostings WHERE "
         counter = 0
         intersect = " INTERSECT "
         final_query_str = ""
-        count_str = " LIMIT " + str(count)
 
         operator = ">="
         for i in range(len(parsed_args) - 1):
@@ -273,7 +297,7 @@ class Manager:
                 self.logger.info(f"final query currently is: \n{final_query_str}")
             operator = "="
 
-        self.logger.info(f"final query is \n{final_query_str + count_str}")
-        return self.cur.execute(final_query_str + count_str + " " + "COLLATE NOCASE")
+        self.logger.info(f"final query is \n{final_query_str}")
+        return self.obtain_dB_results(final_query_str +  " " + "COLLATE NOCASE", count)
     
 
