@@ -22,7 +22,7 @@ class Valid_Args(Enum):
     
 
 class Columns(Enum):
-    ARGS_SIZE = 14
+    ARGS_SIZE = 13
     JOB_COUNTER = 0
     GRP_ID = 1
     APPLICATION_LINK = 2
@@ -36,4 +36,3 @@ class Columns(Enum):
     TIME_SCRAPED = 10
     SCRAPED_SOURCE = 11
     LEVEL = 12
-    COUNT = 13

@@ -27,8 +27,8 @@ class Manager:
                 self.cur.execute(
                     """ CREATE TABLE IF NOT EXISTS jobPostings (
                         job_counter INTEGER PRIMARY KEY,
-                        application_link TEXT NOT NULL,
                         GRP_ID INTEGER NOT NULL,
+                        application_link TEXT NOT NULL,
                         id INTEGER,
                         company_name TEXT NOT NULL, 
                         role TEXT NOT NULL, 
@@ -48,7 +48,7 @@ class Manager:
         except sqlite3.OperationalError as e:
             print("Failed to create table because:", e)
         
-        # TRYING TO LOAD FAKE DATA AND INSERT INTO DB
+        # # TRYING TO LOAD FAKE DATA AND INSERT INTO DB
         data = pd.read_csv("./manager/fake_data.csv")
         data = data.values.tolist()
         self.update_DB(data)
@@ -80,7 +80,8 @@ class Manager:
         #                     """
         # L = "LIMIT 2"
         # intersection = s1 + "INTERSECT " + s2 + " " + L
-        q = self.cur.execute(f"SELECT * FROM jobPostings ORDER BY date_scraped DESC LIMIT 2")
+        site = "https://www.google.com/search?q=matplotlib%20linestyles"
+        q = self.cur.execute(f"SELECT * FROM jobPostings WHERE application_link = ?", (site, ))
 
         for row in q:
             print(row)
@@ -164,14 +165,16 @@ class Manager:
         
     def validate_repeat(self, job_posting: tuple) -> bool:
         link = job_posting[Columns.APPLICATION_LINK.value]
-
-        if link != "NONE" or link != None or link == "":
+        if link == "NONE" or link == None or link == "":
             self.logger.error(f"must have application link for job: {job_posting}")
 
         query_str = f"SELECT * FROM jobPostings WHERE application_link = \'{link}\'"
-        results = self.cur.execute(query_str)
+        
+        results = self.cur.execute(query_str).fetchall()
 
         grp_ids = set([r[Columns.GRP_ID.value] for r in results])
+        for r in results:
+            print(link, r)
 
         if len(results) == 0:
             return True
@@ -183,7 +186,7 @@ class Manager:
         
 
     def validate_date(self, job_posting:tuple) -> bool:
-        assert len(job_posting) == Columns.ARGS_SIZE, "Incorrect number of values"
+        assert len(job_posting) == Columns.ARGS_SIZE.value, "Incorrect number of values"
         if datetime.date.fromisoformat(job_posting[Columns.DATE_POSTED.value]):
             return True
         else:
@@ -203,7 +206,7 @@ class Manager:
         for job in job_postings:
             if self.validate_repeat(job) and self.validate_date(job):
                 try:
-                    self.cur.execute("INSERT INTO jobPostings VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", job)
+                    self.cur.execute("INSERT INTO jobPostings VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", tuple(job))
                     self.logger.info(f"succesfully inserted scrapped job: {job} into the database")
                     self.conn.commit()
                 except Exception as e:
@@ -213,7 +216,9 @@ class Manager:
     def obtain_dB_results(self, query_string: str, count: int) -> list[tuple]:
         out: list[tuple] = []
         while len(out) < count:
-            q_result = self.cur.execute(query_string)
+            # bugged, we are not going forward
+            q_result = self.cur.execute(query_string).fetchall()
+            print(q_result)
             job_posting = list(q_result[0])
             job_posting[Columns.LOCATION.value] = [job_posting[Columns.LOCATION.value]]
             for r in q_result[1:]:
@@ -222,7 +227,7 @@ class Manager:
                 else:
                     out.append(tuple(job_posting))
                     job_posting = list(r)                    
-        
+
         return out
         
 
@@ -273,7 +278,7 @@ class Manager:
         if parsed_args[Valid_Args.COUNT.value] is not None:
             count = parsed_args[Valid_Args.COUNT.value][1]
             if len(alphanum_args) == 2 and alphanum_args[0] == "--count":
-                query_str = f"SELECT * FROM jobPostings ORDER BY date_scraped DESC LIMIT {count}"
+                query_str = f"SELECT * FROM jobPostings ORDER BY date_scraped DESC"
                 return self.obtain_dB_results(query_str, count)
 
         base_str = "SELECT * FROM jobPostings WHERE "
