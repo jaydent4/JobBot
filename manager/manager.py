@@ -27,7 +27,7 @@ class Manager:
                 self.cur.execute(
                     """ CREATE TABLE IF NOT EXISTS jobPostings (
                         job_counter INTEGER PRIMARY KEY,
-                        GRP_ID INTEGER NOT NULL,
+                        grp_id INTEGER NOT NULL,
                         application_link TEXT NOT NULL,
                         id INTEGER,
                         company_name TEXT NOT NULL, 
@@ -80,8 +80,8 @@ class Manager:
         #                     """
         # L = "LIMIT 2"
         # intersection = s1 + "INTERSECT " + s2 + " " + L
-        site = "https://www.google.com/search?q=matplotlib%20linestyles"
-        q = self.cur.execute(f"SELECT * FROM jobPostings WHERE application_link = ?", (site, ))
+        q = self.cur.execute(f"SELECT * FROM jobPostings ORDER BY date_scraped DESC")
+        # q = self.cur.execute(f"SELECT *, MAX(date_scraped) FROM jobPostings ORDER BY date_scraped DESC")
 
         for row in q:
             print(row)
@@ -162,31 +162,49 @@ class Manager:
         else:
             return (False, None)
         
-        
+    """
+    Validates a single job post given by a scraper by checking if the new job's
+    link is already in the database
+
+    Args:
+        job_posting (tuple): a tuple representing a new job posting
+
+    Returns:
+        (bool): 
+            True if the job is not already in the database
+            False if the job is already in the database
+    """
     def validate_repeat(self, job_posting: tuple) -> bool:
+        assert len(job_posting) == Columns.ARGS_SIZE.value, "Incorrect number of values"
+
         link = job_posting[Columns.APPLICATION_LINK.value]
         if link == "NONE" or link == None or link == "":
             self.logger.error(f"must have application link for job: {job_posting}")
 
         query_str = f"SELECT * FROM jobPostings WHERE application_link = \'{link}\'"
         
-        results = self.cur.execute(query_str).fetchall()
+        results = self.cur.execute(query_str)
 
-        grp_ids = set([r[Columns.GRP_ID.value] for r in results])
-        for r in results:
-            print(link, r)
+        for row in results:
+            if row[Columns.APPLICATION_LINK.value] != link:
+                self.logger.error(f"this job {job_posting}'s application link already exists in the database")
+                return False
 
-        if len(results) == 0:
-            return True
-        elif len(grp_ids) == 1 and job_posting[Columns.GRP_ID.value] in grp_ids:
-            return True
-        else:
-            self.logger.error(f"this job {job_posting}'s application link already exists in the database")
-            return False
-        
+        return True
+            
 
+    """
+    Validates the date format of a single new job posting from a scraper
+
+    Args:
+        job_posting (tuple): a tuple representing a new job posting
+
+    Returns:
+        (bool): 
+            True if the date is of YYYY-MM-DD format
+            False if the date is not of YYYY-MM-DD format
+    """
     def validate_date(self, job_posting:tuple) -> bool:
-        assert len(job_posting) == Columns.ARGS_SIZE.value, "Incorrect number of values"
         if datetime.date.fromisoformat(job_posting[Columns.DATE_POSTED.value]):
             return True
         else:
@@ -214,20 +232,30 @@ class Manager:
 
 
     def obtain_dB_results(self, query_string: str, count: int) -> list[tuple]:
+        print(query_string, count)
         out: list[tuple] = []
-        while len(out) < count:
-            # bugged, we are not going forward
-            q_result = self.cur.execute(query_string).fetchall()
-            print(q_result)
-            job_posting = list(q_result[0])
-            job_posting[Columns.LOCATION.value] = [job_posting[Columns.LOCATION.value]]
-            for r in q_result[1:]:
-                if job_posting[Columns.GRP_ID.value] == r[Columns.GRP_ID.value]:
-                    job_posting[Columns.LOCATION.value].append(r[Columns.LOCATION.value])
-                else:
-                    out.append(tuple(job_posting))
-                    job_posting = list(r)                    
+        gid_search_str = "SELECT * FROM jobPostings WHERE grp_id = "
+        q_result = self.cur.execute(query_string)
+        
+        seen = set()
+        for row in q_result:
+            if row not in seen:
+                curr_job_posting = list(row)
+                gid = curr_job_posting[Columns.GRP_ID.value]
+                curr_job_posting[Columns.LOCATION.value] = [curr_job_posting[Columns.LOCATION.value]]
+                seen.add(row)
+                temp_cur = self.conn.cursor()
+                grp_members = temp_cur.execute(gid_search_str + str(gid))
 
+                for grp_mem in grp_members:
+                    if grp_mem not in seen:
+                        curr_job_posting[Columns.LOCATION.value].append(grp_mem[Columns.LOCATION.value])
+                        seen.add(tuple(grp_mem))
+
+                out.append(tuple(curr_job_posting))
+                if len(out) == count:
+                    return out
+            
         return out
         
 
@@ -271,12 +299,12 @@ class Manager:
         self.logger.info(f"validation stage passed")
 
         parsed_args = parse(tuple(alphanum_args))
-
+        
         self.logger.info(f"parsing stage passed")
 
-        count = 1 # default return 1 jobposting from database
+        count = 1
         if parsed_args[Valid_Args.COUNT.value] is not None:
-            count = parsed_args[Valid_Args.COUNT.value][1]
+            count = int(parsed_args[Valid_Args.COUNT.value][1])
             if len(alphanum_args) == 2 and alphanum_args[0] == "--count":
                 query_str = f"SELECT * FROM jobPostings ORDER BY date_scraped DESC"
                 return self.obtain_dB_results(query_str, count)

@@ -96,13 +96,15 @@ async def job(ctx, *args): # args is a tuple
             return None
     
     query_results = manager.get_data(args)
-    if not query_results:
+    if query_results == None:
         await ctx.send(embed=bad_embed("invalid args"))
+        
     results = False
     for row in query_results:
         results = True
         print(row) #debug print
         await ctx.send(embed=embed(row))
+    print(results)
     if not results:
         await ctx.send(embed=bad_embed("no query results"))
 
