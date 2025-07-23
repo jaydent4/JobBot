@@ -25,6 +25,9 @@ def validate_args(args) -> bool:
     
     curr_args: list[str] = []
     curr_arg_type = args[left]
+    if curr_arg_type not in ARG_TYPES:
+        logger.error('first arg is not an option')
+        return False
     for right in range(1, len(args)):
         if args[right].startswith("--"):
             if len(curr_args) == 0:
@@ -48,7 +51,7 @@ def parser_helper(curr_arg_type, curr_args, parsed_args):
     arg = " ".join(curr_args)
     match curr_arg_type:
         case "--time":
-            parsed_args[Valid_Args.TIME.value] = ("date_posted", count_days(arg))
+            parsed_args[Valid_Args.TIME.value] = ("date_scraped", count_days(arg))
         case "--company":
             parsed_args[Valid_Args.COMPANY.value] = ("company_name", arg)
         case "--role":
