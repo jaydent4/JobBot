@@ -22,16 +22,18 @@ class Valid_Args(Enum):
     
 
 class Columns(Enum):
-    ARGS_SIZE = 12
-    APPLICATION_LINK = 0
-    ID = 1
-    COMPANY_NAME = 2
-    ROLE = 3
-    LOCATION = 4
-    DATE_POSTED = 5
-    TIME_POSTED = 6
-    DATE_SCRAPED = 7
-    TIME_SCRAPED = 8
-    SCRAPED_SOURCE = 9
-    LEVEL = 10
-    COUNT = 11
+    ARGS_SIZE = 14
+    JOB_COUNTER = 0
+    GRP_ID = 1
+    APPLICATION_LINK = 2
+    ID = 3
+    COMPANY_NAME = 4
+    ROLE = 5
+    LOCATION = 6
+    DATE_POSTED = 7
+    TIME_POSTED = 8
+    DATE_SCRAPED = 9
+    TIME_SCRAPED = 10
+    SCRAPED_SOURCE = 11
+    LEVEL = 12
+    COUNT = 13

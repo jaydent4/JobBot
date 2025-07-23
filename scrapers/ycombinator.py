@@ -2,6 +2,7 @@ from base import ScraperBase
 import requests
 from bs4 import BeautifulSoup
 from datetime import datetime
+from config import Config
 from enum import Enum
 
 class Columns(Enum):
@@ -50,7 +51,7 @@ class ycombinatorScraper(ScraperBase):
 
                 job_link = ""
                 if "item" in links[i]["href"]:
-                    job_link = self.ycombo_joburl_base + links[i]["href"]
+                   job_link = self.ycombo_joburl_base + links[i]["href"]
                 else:
                     job_link = links[i]["href"]
 

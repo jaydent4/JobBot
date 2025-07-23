@@ -14,21 +14,19 @@ class Manager:
         self.performance_logger = setup_logging("Manager-performance", "INFO", "INFO", "performance.log")
 
         self.sources = sources
-        #print(self.sources)
         
-        # puts scrapers in dict[str, Obj] ex: github: GitHubScraper (object)
         self.scrapers = {}
-
         self.load_scrapers()
         
         try:
             with sqlite3.connect('./job.db') as self.conn:
                 self.cur = self.conn.cursor()
 
-                # creates a dB if there isn't one yet; opens existing dB if there is
                 self.cur.execute(
                     """ CREATE TABLE IF NOT EXISTS jobPostings (
-                        application_link TEXT PRIMARY KEY,
+                        job_counter INTEGER PRIMARY KEY,
+                        application_link TEXT NOT NULL,
+                        GRP_ID INTEGER NOT NULL,
                         id INTEGER,
                         company_name TEXT NOT NULL, 
                         role TEXT NOT NULL, 
@@ -47,18 +45,14 @@ class Manager:
                 print("Table exists.")
         except sqlite3.OperationalError as e:
             print("Failed to create table because:", e)
+        
+        # TRYING TO LOAD FAKE DATA AND INSERT INTO DB
+        data = pd.read_csv("./manager/fake_data.csv")
+        data = data.values.tolist()
+        self.update_DB(data) 
 
-        # TRYING TO LOAD FAKE DATA AND INSERT INTO DB, IT WORKS BTW
-        # data = pd.read_csv("./manager/fake_data.csv")
-        # print(data)
-        # data = data.values.tolist()
-        # self.cur.executemany("INSERT INTO jobPostings VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data)
-        # self.conn.commit()
-
-        # prints out what is currently in the db
-        for row in self.cur.execute("SELECT * FROM jobPostings ORDER BY id"):
+        for row in self.cur.execute("SELECT * FROM jobPostings ORDER BY job_counter"):
             print(row)
-        # # need to calculate today's date and the input argument ex: --time 5 day and then input that somehow as a query to sql
 
         print("------")
         # # checking queries, but how to make sure we dont' ahve 10! query cases?
@@ -159,12 +153,34 @@ class Manager:
     """
     def update(self) -> tuple[bool, list[tuple] | None]:
         new_postings = self.run_scrapers()
-        # cache would be updated somewhere in this method
         if len(new_postings) > 0:
             self.update_DB(new_postings)
             return (True, new_postings)
         else:
             return (False, None)
+        
+    # def validate_null(self, job_posting: tuple) -> bool:
+    #     if len(job_posting) == Columns.ARGS_SIZE:
+    #         self.logger.error(f"Incorrect number of values for job: {job_posting}")
+    #         return False
+    #     elif type(job_posting["job_counter"]) != int:
+    #         self.logger.error(f"invalid primary key")
+    #     return True
+        
+    def validate_repeat(self, job_posting: tuple) -> bool:
+        link = job_posting[Columns.APPLICATION_LINK]
+        if link != "NONE" or link != None:
+            self.logger.error(f"must have application link for job: {job_posting}")
+        # check if same linke exists
+        results = 
+        
+    def validate_date(self, job_posting:tuple) -> bool:
+        assert len(job_posting) == Columns.ARGS_SIZE, "Incorrect number of values"
+        if datetime.date.fromisoformat(job_posting[Columns.DATE_POSTED.value]):
+            return True
+        else:
+            self.logger.error(f"scraped {job_posting} does not have the correct date_posted format of: YYYY-MM-DD")
+            return False
         
     
     """
@@ -177,15 +193,13 @@ class Manager:
     """
     def update_DB(self, job_postings: list[tuple]) -> None:
         for job in job_postings:
-            if datetime.date.fromisoformat(job[Columns.DATE_POSTED.value]):
+            if self.validate_date(job):
                 try:
-                    self.cur.execute("INSERT INTO jobPostings VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", job)
+                    self.cur.execute("INSERT INTO jobPostings VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", job)
                     self.logger.info(f"succesfully inserted scrapped job: {job} into the database")
                     self.conn.commit()
                 except Exception as e:
                     self.logger.error(f"Something errored while inserting scrapped job {job} into the main database: {e}")
-            else:
-                self.logger.error(f"scrapped job: {job} does not have the correct date_posted format of: YYYY-MM-DD")
 
     
     """

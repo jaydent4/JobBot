@@ -1,3 +1,6 @@
-sources: {github: "https://github.com/SimplifyJobs/Summer2026-Internships"}
 channel: 1392010751023120394
+grp_id: 0
+job_counter: 0
 rate: 5
+sources:
+  github: https://github.com/SimplifyJobs/Summer2026-Internshipschannel
