@@ -32,7 +32,8 @@ class Manager:
                         id INTEGER,
                         company_name TEXT NOT NULL, 
                         role TEXT NOT NULL, 
-                        location TEXT NOT NULL, 
+                        city TEXT NOT NULL,
+                        state TEXT NOT NULL, 
                         date_posted DATE NOT NULL,
                         time_posted TIME, 
                         date_scraped DATE NOT NULL,
@@ -178,6 +179,7 @@ class Manager:
         assert len(job_posting) == Columns.ARGS_SIZE.value, "Incorrect number of values"
 
         link = job_posting[Columns.APPLICATION_LINK.value]
+        gid = job_posting[Columns.GRP_ID.value]
         if link == "NONE" or link == None or link == "":
             self.logger.error(f"must have application link for job: {job_posting}")
 
@@ -186,7 +188,7 @@ class Manager:
         results = self.cur.execute(query_str)
 
         for row in results:
-            if row[Columns.APPLICATION_LINK.value] != link:
+            if row[Columns.GRP_ID.value] != gid:
                 self.logger.error(f"this job {job_posting}'s application link already exists in the database")
                 return False
 
@@ -224,7 +226,7 @@ class Manager:
         for job in job_postings:
             if self.validate_repeat(job) and self.validate_date(job):
                 try:
-                    self.cur.execute("INSERT INTO jobPostings VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", tuple(job))
+                    self.cur.execute("INSERT INTO jobPostings VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", tuple(job))
                     self.logger.info(f"succesfully inserted scrapped job: {job} into the database")
                     self.conn.commit()
                 except Exception as e:
@@ -242,14 +244,16 @@ class Manager:
             if row not in seen:
                 curr_job_posting = list(row)
                 gid = curr_job_posting[Columns.GRP_ID.value]
-                curr_job_posting[Columns.LOCATION.value] = [curr_job_posting[Columns.LOCATION.value]]
+                curr_job_posting[Columns.CITY.value] = [curr_job_posting[Columns.CITY.value]]
+                curr_job_posting[Columns.STATE.value] = [curr_job_posting[Columns.STATE.value]]
                 seen.add(row)
                 temp_cur = self.conn.cursor()
                 grp_members = temp_cur.execute(gid_search_str + str(gid))
 
                 for grp_mem in grp_members:
                     if grp_mem not in seen:
-                        curr_job_posting[Columns.LOCATION.value].append(grp_mem[Columns.LOCATION.value])
+                        curr_job_posting[Columns.CITY.value].append(grp_mem[Columns.CITY.value])
+                        curr_job_posting[Columns.STATE.value].append(grp_mem[Columns.STATE.value])
                         seen.add(tuple(grp_mem))
 
                 out.append(tuple(curr_job_posting))
@@ -299,7 +303,7 @@ class Manager:
         self.logger.info(f"validation stage passed")
 
         parsed_args = parse(tuple(alphanum_args))
-        
+        print(parsed_args)
         self.logger.info(f"parsing stage passed")
 
         count = 1
@@ -332,5 +336,4 @@ class Manager:
 
         self.logger.info(f"final query is \n{final_query_str}")
         return self.obtain_dB_results(final_query_str +  " " + "COLLATE NOCASE", count)
-    
 

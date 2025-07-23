@@ -56,8 +56,10 @@ def parser_helper(curr_arg_type, curr_args, parsed_args):
             parsed_args[Valid_Args.COMPANY.value] = ("company_name", arg)
         case "--role":
             parsed_args[Valid_Args.ROLE.value] = ("role", arg)
-        case "--location":
-            parsed_args[Valid_Args.LOCATION.value] = ("location", arg)
+        case "--city":
+            parsed_args[Valid_Args.CITY.value] = ("city", arg)
+        case "--state":
+            parsed_args[Valid_Args.STATE.value] = ("state", arg)
         case "--level":
             parsed_args[Valid_Args.LEVEL.value] = ("level", arg)
         case "--source":
