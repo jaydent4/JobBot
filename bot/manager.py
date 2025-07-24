@@ -1,7 +1,7 @@
 import sqlite3
 import importlib
-from logging_config import setup_logging
-from .args import validate_args, parse
+from utils.logging_config import setup_logging
+from bot.utils.args import validate_args, parse
 import pandas as pd
 import time
 from const import Valid_Args, Columns

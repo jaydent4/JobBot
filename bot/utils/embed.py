@@ -1,5 +1,5 @@
 import discord 
-from const import Columns
+from .const import Columns
 from datetime import datetime
 
 def bad_embed(msg) -> discord.Embed:

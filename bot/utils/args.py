@@ -1,6 +1,5 @@
-from logging_config import setup_logging
+from utils.logging_config import setup_logging
 from const import ARG_TYPES, Valid_Args
-from const import ARG_TYPES
 from datetime import date, timedelta
 
 logger = setup_logging("args", "ERROR", "ERROR", "args.log")

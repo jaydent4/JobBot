@@ -3,20 +3,15 @@ from discord.ext import commands, tasks
 import logging
 from dotenv import load_dotenv
 import os
-from manager.manager import Manager
-from config import Config
-from embed import embed, bad_embed
+# from bot.manager import Manager
+from utils.config import Config
+from utils.embed import embed, bad_embed
 
 config = Config()
 
 JOB_POSTING_CHANNEL = config.channel
-UPDATE_RATE = config.rate
-JOB_COUNTER = config.job_counter
-GROUP_ID_COUNTER = config.grp_id
 
-load_dotenv()
 token = os.getenv("DISCORD_TOKEN")
-print(token)
 
 handler = logging.FileHandler(filename="discord_log", encoding='utf-8', mode='w')
 intents = discord.Intents.default()
@@ -25,12 +20,10 @@ intents.members = True
 
 bot = commands.Bot(command_prefix='!', intents=intents)
 
-manager = Manager(config.sources, JOB_COUNTER, GROUP_ID_COUNTER)
-
 @bot.event
 async def on_ready():
     print(f"{bot.user.name} is working")
-    update.start()
+    # update.start()
 
 """
 Uses the manager to periodically check if the job posting database is updated.
@@ -42,18 +35,17 @@ Args:
 Return:
     None
 """
-@tasks.loop(hours=UPDATE_RATE)
-async def update():
-    channel = bot.get_channel(JOB_POSTING_CHANNEL)
-    await channel.send("Automatic dB Update began")
-    updateInfo = manager.update()
-    if updateInfo[0]:
-        new_postings = updateInfo[1]
+# async def update():
+#     channel = bot.get_channel(JOB_POSTING_CHANNEL)
+#     await channel.send("Automatic dB Update began")
+#     updateInfo = manager.update()
+#     if updateInfo[0]:
+#         new_postings = updateInfo[1]
 
-        for new_job in new_postings:
-            await channel.send(embed=embed(new_job))
-    else:
-        await channel.send("No new j*bs posted. Stay unemployed gang L bozo")
+#         for new_job in new_postings:
+#             await channel.send(embed=embed(new_job))
+#     else:
+#         await channel.send("No new j*bs posted. Stay unemployed gang L bozo")
 
 
 """
@@ -95,15 +87,15 @@ async def job(ctx, *args): # args is a tuple
             await ctx.send(embed=bad_embed("y u putting other args with help"))
             return None
     
-    query_results = manager.get_data(args)
-    if query_results == None:
-        await ctx.send(embed=bad_embed("invalid args"))
+    # query_results = manager.get_data(args)
+    # if query_results == None:
+    #     await ctx.send(embed=bad_embed("invalid args"))
         
     results = False
-    for row in query_results:
-        results = True
-        print(row) #debug print
-        await ctx.send(embed=embed(row))
+    # for row in query_results:
+    #     results = True
+    #     print(row) #debug print
+    #     await ctx.send(embed=embed(row))
     print(results)
     if not results:
         await ctx.send(embed=bad_embed("no query results"))
