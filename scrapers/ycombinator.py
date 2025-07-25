@@ -24,10 +24,12 @@ class ycombinatorScraper(ScraperBase):
     def __init__(self, url):
         self.scraped_source = "ycombinator"
         self.ycombo_joburl_base = "https://news.ycombinator.com/" #"https://news.ycombinator.com/item?id=44573320"
-        default = "NONE"
         self.url = url
     
-    def scrape(self, job_counter, grp_counter) -> list[tuple] | None:
+    def scrape(self) -> list[tuple] | None:
+        # use update_config_value
+        # use trim_url
+        # use merkle somehow
         self.datetime = datetime.now()
         self.date_scraped = self.datetime.date()
         self.time_scraped = self.datetime.time()

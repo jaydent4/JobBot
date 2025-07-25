@@ -11,8 +11,6 @@ config = Config()
 
 JOB_POSTING_CHANNEL = config.channel
 UPDATE_RATE = config.rate
-JOB_COUNTER = config.job_counter
-GROUP_ID_COUNTER = config.grp_id
 
 load_dotenv()
 token = os.getenv("DISCORD_TOKEN")
@@ -25,7 +23,7 @@ intents.members = True
 
 bot = commands.Bot(command_prefix='!', intents=intents)
 
-manager = Manager(config.sources, JOB_COUNTER, GROUP_ID_COUNTER)
+manager = Manager(config.sources, config)
 
 @bot.event
 async def on_ready():

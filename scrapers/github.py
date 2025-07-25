@@ -16,7 +16,7 @@ class githubScraper(ScraperBase):
     Returns:
         List of tuples
     """
-    def scrape(self, job_counter, grp_id) -> list[tuple]:
+    def scrape(self) -> list[tuple]:
         # url = "https://github.com/SimplifyJobs/Summer2026-Internships"
         result = requests.get(self.url).text
         doc = BeautifulSoup(result, "lxml")
