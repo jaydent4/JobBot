@@ -15,8 +15,6 @@ class Manager:
 
         self.sources = sources
         self.config = config
-        self.job_counter = self.config.job_counter
-        self.grp_id = self.config.grp_id
         
         self.scrapers = {}
         self.load_scrapers()
@@ -49,6 +47,7 @@ class Manager:
                 print("Table exists.")
         except sqlite3.OperationalError as e:
             print("Failed to create table because:", e)
+
         
         # # TRYING TO LOAD FAKE DATA AND INSERT INTO DB
         data = pd.read_csv("./manager/fake_data.csv")
@@ -122,7 +121,7 @@ class Manager:
         if name not in self.scrapers:
             self.logger.error(f'Scraper for {name} does not exist')
             return None
-        return self.scrapers[name].scrape(self.job_counter, self.grp_id)
+        return self.scrapers[name].scrape()
 
     """
     Cleans scraper output by reassigning job_id and grp_id values
@@ -139,14 +138,14 @@ class Manager:
         for job in og_out:
             njob = list(job)
 
-            njob[Columns.JOB_COUNTER.value] = self.job_counter
+            njob[Columns.JOB_COUNTER.value] = self.config.job_counter
             self.config.update_config_value("job_counter", 1)
 
             if job[Columns.GRP_ID.value] != curr:
                 curr = job[Columns.GRP_ID.value]
                 self.config.update_config_value("grp_id", 1)
  
-            njob[Columns.GRP_ID.value] = self.grp_id
+            njob[Columns.GRP_ID.value] = self.config.grp_id
 
             out.append(tuple(njob))
         self.config.update_config_value("grp_id", 1)
