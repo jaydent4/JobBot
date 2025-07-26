@@ -135,16 +135,21 @@ class Manager:
     """
     def clean_scraper_output(self, og_out: list[tuple]):
         out:list[tuple] = []
+        curr = og_out[0][Columns.GRP_ID.value]
         for job in og_out:
             njob = list(job)
 
             njob[Columns.JOB_COUNTER.value] = self.job_counter
             self.config.update_config_value("job_counter", 1)
-            
+
+            if job[Columns.GRP_ID.value] != curr:
+                curr = job[Columns.GRP_ID.value]
+                self.config.update_config_value("grp_id", 1)
+ 
             njob[Columns.GRP_ID.value] = self.grp_id
-            self.config.update_config_value("grp_id", 1)
 
             out.append(tuple(njob))
+        self.config.update_config_value("grp_id", 1)
         return out
 
 
