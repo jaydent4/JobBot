@@ -1,8 +1,72 @@
-from .base import ScraperBase
+from base import ScraperBase
 import requests
 from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
-# from const import Columns
+import re
+# from const import US_STATE_TO_ABBRE
+
+US_STATE_TO_ABBRE: dict[str, str] = {
+    "Alabama": "AL",
+    "Alaska": "AK",
+    "Arizona": "AZ",
+    "Arkansas": "AR",
+    "California": "CA",
+    "Colorado": "CO",
+    "Connecticut": "CT",
+    "Delaware": "DE",
+    "Florida": "FL",
+    "Georgia": "GA",
+    "Hawaii": "HI",
+    "Idaho": "ID",
+    "Illinois": "IL",
+    "Indiana": "IN",
+    "Iowa": "IA",
+    "Kansas": "KS",
+    "Kentucky": "KY",
+    "Louisiana": "LA",
+    "Maine": "ME",
+    "Maryland": "MD",
+    "Massachusetts": "MA",
+    "Michigan": "MI",
+    "Minnesota": "MN",
+    "Mississippi": "MS",
+    "Missouri": "MO",
+    "Montana": "MT",
+    "Nebraska": "NE",
+    "Nevada": "NV",
+    "New Hampshire": "NH",
+    "New Jersey": "NJ",
+    "New Mexico": "NM",
+    "New York": "NY",
+    "North Carolina": "NC",
+    "North Dakota": "ND",
+    "Ohio": "OH",
+    "Oklahoma": "OK",
+    "Oregon": "OR",
+    "Pennsylvania": "PA",
+    "Rhode Island": "RI",
+    "South Carolina": "SC",
+    "South Dakota": "SD",
+    "Tennessee": "TN",
+    "Texas": "TX",
+    "Utah": "UT",
+    "Vermont": "VT",
+    "Virginia": "VA",
+    "Washington": "WA",
+    "West Virginia": "WV",
+    "Wisconsin": "WI",
+    "Wyoming": "WY",
+    "District of Columbia": "DC",
+    "American Samoa": "AS",
+    "Guam": "GU",
+    "Northern Mariana Islands": "MP",
+    "Puerto Rico": "PR",
+    "United States Minor Outlying Islands": "UM",
+    "Virgin Islands, U.S.": "VI",
+}
+
+
+
 
 class githubScraper(ScraperBase):
     def __init__(self, url):
@@ -32,7 +96,7 @@ class githubScraper(ScraperBase):
             rows = tbody.find_all("tr")
 
             prev_company = None
-            job_id = 1
+            job_id = 0
 
             for row in rows:
                 cols = row.find_all("td")
@@ -55,37 +119,57 @@ class githubScraper(ScraperBase):
 
                 company = current_job_data[0]
                 role = current_job_data[1]
-                location = current_job_data[2]
+                location = self.parse_location(current_job_data[2])
                 link = link_data.get("href") if link_data else "None"
                 date_posted = posted_date.strftime("%Y %b %d")
                 time_posted = posted_date.strftime("%H:%M")
                 level = "Intern"
 
-
                 
-                job_info = (
-                    # job_counter,
-                    # grp_id,
-                    link,
-                    job_id,
-                    company,
-                    role,
-                    location,
-                    date_posted,
-                    time_posted,
-                    date_scraped,
-                    time_scraped,
-                    "GitHub",
-                    level
-                )
-                job_data.append(job_info)
+                # job_info = (
+                #     job_counter,
+                #     grp_id,
+                #     link,
+                #     job_id,
+                #     company,
+                #     role,
+                #     city,
+                #     state,
+                #     date_posted,
+                #     time_posted,
+                #     date_scraped,
+                #     time_scraped,
+                #     "GitHub",
+                #     level
+                # )
+                # job_data.append(job_info)
 
         # for i in job_data:
-        #     print(i)
+            # print(i)
         # print(job_data)
         return job_data
 
 
-# if __name__ == "__main__":
-#     scraper = githubScraper("https://github.com/SimplifyJobs/Summer2026-Internships")
-#     scraper.scrape()
+    def parse_location(self, locations):
+            locations = locations.strip()
+            result = []
+
+            pattern = r'([A-Za-z .]+?),?\s*([A-Z]{2})'
+            matches = re.findall(pattern, locations)
+
+            for city, state in matches:
+                city = city.strip()
+                result.append((city, state))
+
+            if not result:
+                state = US_STATE_TO_ABBRE.get(locations)
+                if state:
+                    result.append((locations, state))
+                else:
+                    result.append((locations, None))
+            return result
+
+
+if __name__ == "__main__":
+    scraper = githubScraper("https://github.com/SimplifyJobs/Summer2026-Internships")
+    scraper.scrape()
