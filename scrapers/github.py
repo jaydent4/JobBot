@@ -101,9 +101,18 @@ class githubScraper(ScraperBase):
             for row in rows:
                 cols = row.find_all("td")
 
-                # checks if post date is within 0-2 days
-                if cols[4].get_text(strip=True) not in ["0d", "1d", "2d", "3d"]:
-                    continue
+                # checks if post date is within 0-3 days
+                date_str = cols[4].get_text(strip=True)
+                github_type = self.detect_github(date_str)
+    
+                if github_type == "vans":
+                    posted_date = datetime.strptime(date_str + f" {datetime.now().year}", "%b %d %Y")
+                    if datetime.now() - posted_date > timedelta(days=4):
+                        continue
+                elif github_type == "simp":
+                    if cols[4].get_text(strip=True) not in ["0d", "1d", "2d", "3d"]:
+                        continue
+                    posted_date = datetime.now() - timedelta(days=int(current_job_data[3][0]))
 
                 current_job_data = [col.get_text(strip=True).encode("ascii", "ignore").decode("ascii") for i, col in enumerate(cols) if i != 3]
 
@@ -114,7 +123,6 @@ class githubScraper(ScraperBase):
                     current_job_data[0] = prev_company
                 # print(current_job_data)
 
-                posted_date = datetime.now() - timedelta(days=int(current_job_data[3][0]))
                 link_data = cols[3].find("a")
 
                 job_id = None
@@ -177,6 +185,12 @@ class githubScraper(ScraperBase):
             return result
 
 
+    def detect_github(self, date: str) -> str:
+        if re.fullmatch(r"\d+d", date.strip()):
+            return "simp"
+        if re.fullmatch(r"[A-Za-z]{3} \d{2}", date.strip()):
+            return "vans"
+
 # if __name__ == "__main__":
-#     scraper = githubScraper("https://github.com/SimplifyJobs/Summer2026-Internships")
+#     scraper = githubScraper("https://github.com/vanshb03/Summer2026-Internships")
 #     print(scraper.scrape())
