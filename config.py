@@ -16,7 +16,7 @@ grp_id: int
 """
 
 class Config:
-    def __init__(self, config="default_config.yml"):    
+    def __init__(self, config="default_config.yml"):
         with open(config, 'r') as f:
             config_data = yaml.load(f, Loader=yaml.FullLoader)
             self.sources = config_data["sources"]
@@ -30,7 +30,7 @@ class Config:
         logger.info(f'PRINTING CONFIG:\n\tsources: {self.sources}\n\tchannel: {self.channel}\n\trate: {self.rate}\n')
     
     def update_config_value(self, key: str, val: int, config="default_config.yml"):
-        if key != "job_counter" or key != "grp_id":
+        if key not in set(("job_counter", "grp_id")):
             raise AssertionError("wrong use of update config value buddy")
 
         with open(config, 'r') as f:

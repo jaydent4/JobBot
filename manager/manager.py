@@ -6,16 +6,15 @@ import pandas as pd
 import time
 from const import Valid_Args, Columns
 import datetime
-
+from config import Config
 
 class Manager:
-    def __init__(self, sources, job_counter, grp_id):
+    def __init__(self, sources, config: Config):
         self.logger = setup_logging("Manager", "INFO", "INFO", "manager.log")
         self.performance_logger = setup_logging("Manager-performance", "INFO", "INFO", "performance.log")
 
         self.sources = sources
-        self.job_counter = job_counter
-        self.grp_id = grp_id
+        self.config = config
         
         self.scrapers = {}
         self.load_scrapers()
@@ -48,6 +47,7 @@ class Manager:
                 print("Table exists.")
         except sqlite3.OperationalError as e:
             print("Failed to create table because:", e)
+
         
         # # TRYING TO LOAD FAKE DATA AND INSERT INTO DB
         data = pd.read_csv("./manager/fake_data.csv")
@@ -121,7 +121,35 @@ class Manager:
         if name not in self.scrapers:
             self.logger.error(f'Scraper for {name} does not exist')
             return None
-        return self.scrapers[name].scrape(self.job_counter, self.grp_id)
+        return self.scrapers[name].scrape()
+
+    """
+    Cleans scraper output by reassigning job_id and grp_id values
+    Args:
+        og_out (list[tuple]): original output from a scraper
+    
+    Return:
+        list[tuple]: cleaned output where the job_counter of each job is from the
+                     global job_id counter and grp_ids are from the global grp_id counter
+    """
+    def clean_scraper_output(self, og_out: list[tuple]):
+        out:list[tuple] = []
+        curr = og_out[0][Columns.GRP_ID.value]
+        for job in og_out:
+            njob = list(job)
+
+            njob[Columns.JOB_COUNTER.value] = self.config.job_counter
+            self.config.update_config_value("job_counter", 1)
+
+            if job[Columns.GRP_ID.value] != curr:
+                curr = job[Columns.GRP_ID.value]
+                self.config.update_config_value("grp_id", 1)
+ 
+            njob[Columns.GRP_ID.value] = self.config.grp_id
+
+            out.append(tuple(njob))
+        self.config.update_config_value("grp_id", 1)
+        return out
 
 
     """
@@ -141,6 +169,7 @@ class Manager:
             if not scraper_result:
                 self.logger.error(f"SCRAPER {name} DOES NOT EXIST")
             else:
+                scraper_result = self.clean_scraper_output(scraper_result)
                 self.performance_logger.info(f'Scraper {name} took {elapsed_time:.4f} seconds to run')
                 assert(scraper_result != None) # or else red siggly
                 result.extend(scraper_result)

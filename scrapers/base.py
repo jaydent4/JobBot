@@ -11,5 +11,5 @@ class ScraperBase(ABC):
     """
     @classmethod
     @abstractmethod
-    def scrape(self, job_counter, grp_id) -> list[tuple]:
+    def scrape(self) -> list[tuple]:
         pass
