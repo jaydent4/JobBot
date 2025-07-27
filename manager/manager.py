@@ -187,9 +187,7 @@ class Manager:
     def update(self) -> tuple[bool, list[tuple] | None]:
         new_postings = self.run_scrapers()
         if len(new_postings) > 0:
-            print("yes new postings")
             self.update_DB(new_postings)
-            print("does it gete here?")
             return (True, new_postings)
         else:
             return (False, None)

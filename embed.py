@@ -9,18 +9,18 @@ def bad_embed(msg) -> discord.Embed:
     embed.set_image(url=fries)
     return embed
 
-def parse_locs(cities, states) -> list[str]:
+def parse_locs(city, state) -> list[str]:
     out = []
-    for c, s in zip(cities, states):
-        out.append(c + ", " + s)
+    # for c, s in (cities, states):
+    out.append(city + ", " + state)
     return out
 
 def embed(query:tuple) -> discord.Embed:
     id = replace_none(query[Columns.ID.value])
     company_name = replace_none(query[Columns.COMPANY_NAME.value])
     role = replace_none(query[Columns.ROLE.value])
-    cities = replace_none(query[Columns.CITY.value])
-    states = replace_none(query[Columns.STATE.value])
+    city = replace_none(query[Columns.CITY.value])
+    state = replace_none(query[Columns.STATE.value])
     link = replace_none(query[Columns.APPLICATION_LINK.value])
     date_posted = date_prettify(query[Columns.DATE_POSTED.value])
     date_scraped = replace_none(query[Columns.DATE_SCRAPED.value])
@@ -29,7 +29,7 @@ def embed(query:tuple) -> discord.Embed:
     title = f'**{company_name}** - {role}'
     link = link if link.startswith("http") else None
     embed = discord.Embed(title=title, url=link, color=discord.Color.from_str("#7785cc"))
-    embed.add_field(name="Location", value=parse_locs(cities, states), inline=True)
+    embed.add_field(name="Location", value=parse_locs(city, state), inline=True)
     embed.add_field(name="Level", value=level, inline=True)
     embed.add_field(name="\u200b", value="\u200b", inline=True)
     embed.add_field(name="Date Posted", value=date_posted, inline=True)
