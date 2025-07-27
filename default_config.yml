@@ -1,6 +1,6 @@
 channel: 1392010751023120394
-grp_id: 7
-job_counter: 8
+grp_id: 23
+job_counter: 32
 rate: 5
 sources:
-  github: https://github.com/SimplifyJobs/Summer2026-Internshipschannel
+  github: https://github.com/SimplifyJobs/Summer2026-Internships
