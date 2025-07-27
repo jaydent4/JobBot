@@ -16,7 +16,7 @@ class githubScraper(ScraperBase):
     Returns:
         List of tuples
     """
-    def scrape(self, job_counter, grp_id) -> list[tuple]:
+    def scrape(self) -> list[tuple]:
         # url = "https://github.com/SimplifyJobs/Summer2026-Internships"
         result = requests.get(self.url).text
         doc = BeautifulSoup(result, "lxml")
@@ -32,6 +32,8 @@ class githubScraper(ScraperBase):
             rows = tbody.find_all("tr")
 
             prev_company = None
+            job_id = 1
+
             for row in rows:
                 cols = row.find_all("td")
 
@@ -51,7 +53,6 @@ class githubScraper(ScraperBase):
                 posted_date = datetime.now() - timedelta(days=int(current_job_data[3][0]))
                 link_data = cols[3].find("a")
 
-                job_id = None
                 company = current_job_data[0]
                 role = current_job_data[1]
                 location = current_job_data[2]
@@ -60,7 +61,11 @@ class githubScraper(ScraperBase):
                 time_posted = posted_date.strftime("%H:%M")
                 level = "Intern"
 
+
+                
                 job_info = (
+                    # job_counter,
+                    # grp_id,
                     link,
                     job_id,
                     company,
