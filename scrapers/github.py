@@ -91,12 +91,14 @@ class githubScraper(ScraperBase):
         date_scraped = datetime.now().strftime("%Y %b %d")
         time_scraped = datetime.now().strftime("%H:%M")
 
+        job_counter = 0
+        grp_id = 0
+
         for table in job_tables[1:]:
             tbody = table.find("tbody")
             rows = tbody.find_all("tr")
 
             prev_company = None
-            job_id = 0
 
             for row in rows:
                 cols = row.find_all("td")
@@ -117,6 +119,7 @@ class githubScraper(ScraperBase):
                 posted_date = datetime.now() - timedelta(days=int(current_job_data[3][0]))
                 link_data = cols[3].find("a")
 
+                job_id = None
                 company = current_job_data[0]
                 role = current_job_data[1]
                 location = self.parse_location(current_job_data[2])
@@ -125,27 +128,31 @@ class githubScraper(ScraperBase):
                 time_posted = posted_date.strftime("%H:%M")
                 level = "Intern"
 
-                
-                # job_info = (
-                #     job_counter,
-                #     grp_id,
-                #     link,
-                #     job_id,
-                #     company,
-                #     role,
-                #     city,
-                #     state,
-                #     date_posted,
-                #     time_posted,
-                #     date_scraped,
-                #     time_scraped,
-                #     "GitHub",
-                #     level
-                # )
-                # job_data.append(job_info)
+                for loc in location:
+                    city, state = loc[0], loc[1]
 
-        # for i in job_data:
-            # print(i)
+                    job_info = (
+                        job_counter,
+                        grp_id,
+                        link,
+                        job_id,
+                        company,
+                        role,
+                        city,
+                        state,
+                        date_posted,
+                        time_posted,
+                        date_scraped,
+                        time_scraped,
+                        "GitHub",
+                        level
+                    )
+                    job_data.append(job_info)
+                    job_counter += 1
+                grp_id += 1
+
+        for i in job_data:
+            print(i)
         # print(job_data)
         return job_data
 
