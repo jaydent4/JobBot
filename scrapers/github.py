@@ -5,8 +5,8 @@ from datetime import datetime, timedelta
 # from const import Columns
 
 class githubScraper(ScraperBase):
-    def __init__(self, url):
-        self.url = url
+    def __init__(self):
+        self.url = "https://github.com/SimplifyJobs/Summer2026-Internships"
 
     """
     Scapes job information off of GitHub README Repos of job postings
@@ -79,8 +79,3 @@ class githubScraper(ScraperBase):
         #     print(i)
         # print(job_data)
         return job_data
-
-
-# if __name__ == "__main__":
-#     scraper = githubScraper("https://github.com/SimplifyJobs/Summer2026-Internships")
-#     scraper.scrape()

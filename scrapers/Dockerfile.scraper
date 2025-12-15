@@ -9,5 +9,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-# Default entrypoint — always runs runner.py
 ENTRYPOINT ["python", "runner.py"]

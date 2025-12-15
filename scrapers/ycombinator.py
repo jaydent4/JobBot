@@ -21,11 +21,11 @@ class Columns(Enum):
     COUNT = 11
 
 class ycombinatorScraper(ScraperBase):
-    def __init__(self, url):
+    def __init__(self):
         self.scraped_source = "ycombinator"
         self.ycombo_joburl_base = "https://news.ycombinator.com/" #"https://news.ycombinator.com/item?id=44573320"
         default = "NONE"
-        self.url = url
+        self.url = "https://news.ycombinator.com/jobs"
     
     def scrape(self, job_counter, grp_counter) -> list[tuple] | None:
         self.datetime = datetime.now()
@@ -88,8 +88,3 @@ class ycombinatorScraper(ScraperBase):
         #     print("\n")
         #     print(tbody)
         return None
-    
-
-if __name__ == "__main__":
-    scraper = ycombinatorScraper(url="https://news.ycombinator.com/jobs")
-    scraper.scrape()
