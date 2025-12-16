@@ -1,5 +1,5 @@
-from scrapers.github import githubScraper
-from scrapers.ycombinator import ycombinatorScraper
+from github import githubScraper
+from ycombinator import ycombinatorScraper
 
 SCRAPER_REGISTRY = {
     "github": githubScraper,

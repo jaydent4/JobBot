@@ -2,7 +2,6 @@ from base import ScraperBase
 import requests
 from bs4 import BeautifulSoup
 from datetime import datetime
-from config import Config
 from enum import Enum
 
 class Columns(Enum):
