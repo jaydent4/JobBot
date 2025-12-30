@@ -1,74 +1,15 @@
-from .base import ScraperBase
+from base import ScraperBase
 import requests
 from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
 import re
 from const import US_STATE_TO_ABBRE
 
-# US_STATE_TO_ABBRE: dict[str, str] = {
-#     "Alabama": "AL",
-#     "Alaska": "AK",
-#     "Arizona": "AZ",
-#     "Arkansas": "AR",
-#     "California": "CA",
-#     "Colorado": "CO",
-#     "Connecticut": "CT",
-#     "Delaware": "DE",
-#     "Florida": "FL",
-#     "Georgia": "GA",
-#     "Hawaii": "HI",
-#     "Idaho": "ID",
-#     "Illinois": "IL",
-#     "Indiana": "IN",
-#     "Iowa": "IA",
-#     "Kansas": "KS",
-#     "Kentucky": "KY",
-#     "Louisiana": "LA",
-#     "Maine": "ME",
-#     "Maryland": "MD",
-#     "Massachusetts": "MA",
-#     "Michigan": "MI",
-#     "Minnesota": "MN",
-#     "Mississippi": "MS",
-#     "Missouri": "MO",
-#     "Montana": "MT",
-#     "Nebraska": "NE",
-#     "Nevada": "NV",
-#     "New Hampshire": "NH",
-#     "New Jersey": "NJ",
-#     "New Mexico": "NM",
-#     "New York": "NY",
-#     "North Carolina": "NC",
-#     "North Dakota": "ND",
-#     "Ohio": "OH",
-#     "Oklahoma": "OK",
-#     "Oregon": "OR",
-#     "Pennsylvania": "PA",
-#     "Rhode Island": "RI",
-#     "South Carolina": "SC",
-#     "South Dakota": "SD",
-#     "Tennessee": "TN",
-#     "Texas": "TX",
-#     "Utah": "UT",
-#     "Vermont": "VT",
-#     "Virginia": "VA",
-#     "Washington": "WA",
-#     "West Virginia": "WV",
-#     "Wisconsin": "WI",
-#     "Wyoming": "WY",
-#     "District of Columbia": "DC",
-#     "American Samoa": "AS",
-#     "Guam": "GU",
-#     "Northern Mariana Islands": "MP",
-#     "Puerto Rico": "PR",
-#     "United States Minor Outlying Islands": "UM",
-#     "Virgin Islands, U.S.": "VI",
-# }
-
 
 class githubScraper(ScraperBase):
-    def __init__(self, url):
-        self.url = url
+    def __init__(self):
+        self.url = "https://github.com/SimplifyJobs/Summer2026-Internships"
+
 
     """
     Scapes job information off of GitHub README Repos of job postings
@@ -78,8 +19,7 @@ class githubScraper(ScraperBase):
     Returns:
         List of tuples
     """
-    def scrape(self) -> list[tuple]:
-        # url = "https://github.com/SimplifyJobs/Summer2026-Internships"
+    def scrape(self, job_counter, grp_id) -> list[tuple]:
         result = requests.get(self.url).text
         doc = BeautifulSoup(result, "lxml")
 
@@ -89,9 +29,6 @@ class githubScraper(ScraperBase):
         date_scraped = datetime.now().strftime("%Y-%m-%d")
         time_scraped = datetime.now().strftime("%H:%M")
 
-        job_counter = 0
-        grp_id = 0
-
         for table in job_tables[1:]:
             tbody = table.find("tbody")
             rows = tbody.find_all("tr")
@@ -100,28 +37,19 @@ class githubScraper(ScraperBase):
 
             for row in rows:
                 cols = row.find_all("td")
-
-                # checks if post date is within 0-3 days
-                date_str = cols[4].get_text(strip=True)
-                github_type = self.detect_github(date_str)
-    
-                if github_type == "vans":
-                    posted_date = datetime.strptime(date_str + f" {datetime.now().year}", "%b %d %Y")
-                    if datetime.now() - posted_date > timedelta(days=4):
-                        continue
-                elif github_type == "simp":
-                    if cols[4].get_text(strip=True) not in ["0d", "1d", "2d", "3d"]:
-                        continue
-                    posted_date = datetime.now() - timedelta(days=int(current_job_data[3][0]))
-
+                if len(cols) == 1:
+                    break
+                
                 current_job_data = [col.get_text(strip=True).encode("ascii", "ignore").decode("ascii") for i, col in enumerate(cols) if i != 3]
-
-                # replaces filler subcategories
+                
+                # stop grabbing roles when the date is passed
+                if current_job_data[3] not in {"0d", "1d", "2d", "3d"}:
+                    break
+                posted_date = datetime.now() - timedelta(days=int(current_job_data[3][0]))
                 if current_job_data[0]:
                     prev_company = current_job_data[0]
                 else:
                     current_job_data[0] = prev_company
-                # print(current_job_data)
 
                 link_data = cols[3].find("a")
 
@@ -157,11 +85,6 @@ class githubScraper(ScraperBase):
                     job_counter += 1
                 grp_id += 1
 
-        # for i in job_data:
-        #     print(i)
-        # print(job_data)
-        # print("Hi")
-        # print(job_data)
         return job_data
 
 
@@ -183,14 +106,3 @@ class githubScraper(ScraperBase):
                 else:
                     result.append((locations, None))
             return result
-
-
-    def detect_github(self, date: str) -> str:
-        if re.fullmatch(r"\d+d", date.strip()):
-            return "simp"
-        if re.fullmatch(r"[A-Za-z]{3} \d{2}", date.strip()):
-            return "vans"
-
-# if __name__ == "__main__":
-#     scraper = githubScraper("https://github.com/vanshb03/Summer2026-Internships")
-#     print(scraper.scrape())
