@@ -154,3 +154,6 @@ dmypy.json
 # Cython debug symbols
 cython_debug/
 discord_log
+
+# Things with tokens
+bot/discord-bot-pod.yaml
