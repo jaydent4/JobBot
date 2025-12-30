@@ -12,15 +12,16 @@ def main():
         raise ValueError(f"Unknown scraper: {scraper_name}")
 
     job_counter = int(os.environ.get("JOB_COUNTER", "0"))
-    grp_id = os.environ.get("GROUP_ID", "default")
+    grp_id = int(os.environ.get("GROUP_ID", "0"))
 
     scraper_cls = SCRAPER_REGISTRY[scraper_name]
     scraper = scraper_cls()
 
     results = scraper.scrape(job_counter, grp_id)
 
+    print(*results, sep='\n') 
     print(f"Scraped {len(results)} jobs")
-    print(results) 
+
 
 if __name__ == "__main__":
     main()
