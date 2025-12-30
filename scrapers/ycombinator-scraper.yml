@@ -1,0 +1,16 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: ycombinator-scraper
+spec:
+  schedule: "* * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+          - name: jobbot-scraper
+            image: jobbot-scraper:latest
+            imagePullPolicy: IfNotPresent
+            args: ["ycombinator"]
